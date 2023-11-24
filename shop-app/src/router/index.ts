@@ -8,7 +8,7 @@ const loginViewName = 'login'
 const indexViewName = 'index'
 const homeViewName = 'home'
 const SignUpViewName = 'signUp'
-const OrdersViewName = 'ordersViewName'
+const OrdersViewName = 'ordersView'
 const notCheckLogin: string[] = [
   productViewName,
   loginViewName,
@@ -59,7 +59,7 @@ const router = createRouter({
       path: '/orders',
       name: OrdersViewName,
       component: () => import('../views/OrdersView.vue')
-    }
+    },
   ]
 })
 
