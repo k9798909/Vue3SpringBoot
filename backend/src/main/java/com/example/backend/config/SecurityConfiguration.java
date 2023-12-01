@@ -8,6 +8,7 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.ExceptionHandlingConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
@@ -39,15 +40,13 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 // UsernamePasswordAuthenticationFilter會在使用formlogin時註冊，沒有註冊也沒關係順序會在FilterOrderRegistration定義
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint((request, response, e) -> response.sendError(HttpStatus.UNAUTHORIZED.value(), HttpStatus.UNAUTHORIZED.getReasonPhrase()))
-                        .accessDeniedHandler((request, response, e) -> response.sendError(HttpStatus.FORBIDDEN.value(), HttpStatus.FORBIDDEN.getReasonPhrase()))
-                );
+                .exceptionHandling(exceptionHandling());
         return http.build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder, UserDetailsService userDetailsService)
+    public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder,
+            UserDetailsService userDetailsService)
             throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http
                 .getSharedObject(AuthenticationManagerBuilder.class);
@@ -66,5 +65,13 @@ public class SecurityConfiguration {
     @Bean
     public JwtTokenFilter jwtTokenFilter() {
         return new JwtTokenFilter(jwtTokenUtils);
+    }
+
+    private Customizer<ExceptionHandlingConfigurer<HttpSecurity>> exceptionHandling() {
+        return exception -> exception
+                .authenticationEntryPoint((request, response, e) -> response.sendError(HttpStatus.UNAUTHORIZED.value(),
+                        HttpStatus.UNAUTHORIZED.getReasonPhrase()))
+                .accessDeniedHandler((request, response, e) -> response.sendError(HttpStatus.FORBIDDEN.value(),
+                        HttpStatus.FORBIDDEN.getReasonPhrase()));
     }
 }

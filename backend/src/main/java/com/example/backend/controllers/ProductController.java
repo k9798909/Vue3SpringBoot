@@ -39,4 +39,5 @@ public class ProductController {
         headers.setContentLength(img.length);
         return new ResponseEntity<>(img, headers, HttpStatus.OK);
     }
+    
 }
