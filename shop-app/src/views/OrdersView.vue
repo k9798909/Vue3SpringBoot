@@ -8,14 +8,14 @@ const orders: Ref<OrdersDto[]> = ref([])
 const dialogShow: Ref<boolean> = ref(false)
 const orderDetails: Ref<OrderDetailDto[]> = ref([])
 
-onMounted(async function () {
+const initOrders = async () => {
   getApiClient()
     .get('/orders')
     .then((res) => {
       orders.value.push(...res.data)
     })
     .catch((e) => console.error(e))
-})
+}
 
 const dtlEvent = (order: OrdersDto) => {
   dialogShow.value = true
@@ -25,6 +25,8 @@ const dtlEvent = (order: OrdersDto) => {
 const dialogFalse = () => {
   dialogShow.value = false
 }
+
+onMounted(initOrders)
 </script>
 
 <template>

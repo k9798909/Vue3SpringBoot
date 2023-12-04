@@ -1,48 +1,36 @@
 <script setup lang="ts">
 import * as UsersService from '@/services/UsersService'
-import { reactive, ref, type Ref } from 'vue'
-import { ViewMsg } from '@/common/MsgEnum'
-import { NetworkErrorCode } from '@/common/HttpEnum'
-import type { AxiosError } from 'axios'
+import { ref, type Ref } from 'vue'
 import { ConstantKey } from '@/common/ConstantKey'
 import type LoginForm from '@/types/form/LoginForm'
 import { useRouter, type Router } from 'vue-router'
 
 const router: Router = useRouter()
-
-//session訊息用完移除
-let msg: Ref<string> = ref(sessionStorage.getItem(ConstantKey.LOGIN_SESSION_MSG) || '')
-sessionStorage.removeItem(ConstantKey.LOGIN_SESSION_MSG)
 //密碼能見度
-let visible: Ref<boolean> = ref(false)
+const visible: Ref<boolean> = ref(false)
+//session訊息用完移除
+const msg: Ref<string> = ref(sessionStorage.getItem(ConstantKey.LOGIN_SESSION_MSG) || '')
+sessionStorage.removeItem(ConstantKey.LOGIN_SESSION_MSG)
 
-let loginForm: LoginForm = {
+const loginForm: Ref<LoginForm> = ref({
   username: '',
   password: ''
-}
-const state = reactive({ loginForm })
+})
 
 const loginEvent = async () => {
   msg.value = ''
 
-  if (!(state.loginForm.username && state.loginForm.password)) {
+  if (!(loginForm.value.username && loginForm.value.password)) {
     msg.value = '請輸入帳號及密碼'
     return
   }
 
-  UsersService.login(state.loginForm)
+  UsersService.login(loginForm.value)
     .then(() => {
       router.push('/index')
     })
     .catch((e) => {
-      let axiosError: AxiosError = e as AxiosError
-      if (NetworkErrorCode.Unauthorized == axiosError.response?.status) {
-        msg.value = ViewMsg.InvalidUsernameOrPassword
-        return
-      }
-
-      console.error('login error:', e)
-      msg.value = ViewMsg.ServerError
+      msg.value = e.message
     })
 }
 </script>
@@ -63,7 +51,7 @@ const loginEvent = async () => {
         placeholder="輸入使用者名稱"
         prepend-inner-icon="mdi-email-outline"
         variant="outlined"
-        v-model="state.loginForm.username"
+        v-model="loginForm.username"
       ></v-text-field>
 
       <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
@@ -86,7 +74,7 @@ const loginEvent = async () => {
         placeholder="輸入密碼"
         prepend-inner-icon="mdi-lock-outline"
         variant="outlined"
-        v-model="state.loginForm.password"
+        v-model="loginForm.password"
         @click:append-inner="visible = !visible"
       ></v-text-field>
       <v-alert class="mb-5" v-if="msg" density="compact" type="error" variant="tonal">{{

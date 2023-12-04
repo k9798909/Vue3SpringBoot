@@ -1,15 +1,23 @@
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
 import * as UsersService from '@/services/UsersService'
+import * as UsersFormValidator from '@/validators/UsersFormValidator'
 import type SignUpForm from '@/types/form/SignUpForm'
 import { useRouter, type Router } from 'vue-router'
-import * as SignUpHelper from './SignUpHelper'
 import SuccessDialog from '@/components/SuccessDialog.vue'
 
 const router: Router = useRouter()
 let dialogShow: Ref<boolean> = ref(false)
 const form: Ref<HTMLFormElement | null> = ref(null)
-const formParams: Ref<SignUpForm> = ref(SignUpHelper.buildSignUpForm())
+const formParams: Ref<SignUpForm> = ref({
+  name: '',
+  birthday: new Date().toLocaleDateString('en-CA'),
+  email: '',
+  address: '',
+  username: '',
+  password: '',
+  chkPassword: ''
+})
 
 async function submit(e: MouseEvent) {
   try {
@@ -21,7 +29,6 @@ async function submit(e: MouseEvent) {
     }
 
     await UsersService.signUp(formParams.value)
-
     dialogShow.value = true
   } catch (error) {
     console.error('註冊失敗', error)
@@ -43,7 +50,7 @@ async function submit(e: MouseEvent) {
           placeholder="輸入帳號"
           variant="outlined"
           density="compact"
-          :rules="SignUpHelper.getUsernameRules()"
+          :rules="UsersFormValidator.getUsernameRules()"
         />
         <div class="text-subtitle-1 text-medium-emphasis">密碼</div>
         <v-text-field
@@ -53,7 +60,7 @@ async function submit(e: MouseEvent) {
           placeholder="輸入密碼"
           variant="outlined"
           density="compact"
-          :rules="SignUpHelper.getPasswordRules()"
+          :rules="UsersFormValidator.getPasswordRules()"
         />
         <div class="text-subtitle-1 text-medium-emphasis">密碼複驗</div>
         <v-text-field
@@ -64,7 +71,7 @@ async function submit(e: MouseEvent) {
           variant="outlined"
           density="compact"
           :rules="[
-            ...SignUpHelper.getChkPasswordRules(),
+            ...UsersFormValidator.getChkPasswordRules(),
             (v) => v === formParams.password || '密碼複驗需與上方密碼相同'
           ]"
         />
@@ -76,7 +83,7 @@ async function submit(e: MouseEvent) {
           placeholder="輸入姓名"
           variant="outlined"
           density="compact"
-          :rules="SignUpHelper.getNameRules()"
+          :rules="UsersFormValidator.getNameRules()"
         />
         <div class="text-subtitle-1 text-medium-emphasis">出生日期</div>
         <v-text-field
@@ -94,7 +101,7 @@ async function submit(e: MouseEvent) {
           variant="outlined"
           density="compact"
           placeholder="輸入電子信箱"
-          :rules="SignUpHelper.getEmailRules()"
+          :rules="UsersFormValidator.getEmailRules()"
         />
         <div class="text-subtitle-1 text-medium-emphasis">地址</div>
         <v-text-field
@@ -104,7 +111,7 @@ async function submit(e: MouseEvent) {
           variant="outlined"
           density="compact"
           placeholder="輸入地址"
-          :rules="SignUpHelper.getAddressRules()"
+          :rules="UsersFormValidator.getAddressRules()"
         />
 
         <v-btn

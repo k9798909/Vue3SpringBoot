@@ -1,38 +1,37 @@
 <script setup lang="ts">
 import Product from '../components/Product.vue'
-import { onMounted, watch, ref, type Ref } from 'vue'
+import { onMounted, ref, type Ref } from 'vue'
 import * as ProductService from '@/services/ProductService'
 import type ProductDto from '@/types/dto/ProductDto'
 import SuccessDialog from '@/components/SuccessDialog.vue'
 
-const allProduct: ProductDto[] = []
-let searchResult: Ref<boolean> = ref(true)
-let searchInput: Ref<string> = ref('')
-let products: Ref<ProductDto[]> = ref([])
-let successAlert: Ref<boolean> = ref(false)
+const searchInput: Ref<string> = ref('')
+const products: Ref<ProductDto[]> = ref([])
+const successAlert: Ref<boolean> = ref(false)
 
-async function loadProductList(): Promise<void> {
+async function initProductList(): Promise<void> {
+  ProductService.findAll()
+    .then((data) => {
+      products.value = data
+    })
+    .catch((e) => {
+      console.error('ProductService findByName', e)
+    })
+}
+
+async function searchEvent(e: MouseEvent): Promise<void> {
   try {
-    allProduct.push(...(await ProductService.findAll()).data)
-    products.value.push(...allProduct)
-  } catch (e) {
-    console.error('掛載所有商品時發生錯誤', e)
+    if (!searchInput.value) {
+      products.value = await ProductService.findAll()
+    }
+
+    products.value = await ProductService.findByName(searchInput.value)
+  } catch (error) {
+    console.error('ProductService searchEvent', e)
   }
 }
 
-function searchEvent(e: MouseEvent): void {
-  products.value = allProduct.filter((t) => t.name.includes(searchInput.value))
-}
-
-onMounted(loadProductList)
-
-watch(
-  () => products.value,
-  () => {
-    searchResult.value = products.value.length != 0
-  },
-  { deep: true }
-)
+onMounted(initProductList)
 </script>
 
 <template>

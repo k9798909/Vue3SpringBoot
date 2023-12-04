@@ -1,15 +1,22 @@
 <script setup lang="ts">
 import { onMounted, ref, type Ref } from 'vue'
+import * as UsersFormValidator from '@/validators/UsersFormValidator'
 import * as UsersService from '@/services/UsersService'
 import type EditUsersForm from '@/types/form/EditUsersForm'
-import * as EditUsersHelper from './EditUsersHelper'
 import SuccessDialog from '@/components/SuccessDialog.vue'
 
 const dialogShow = ref(false)
 const isEdit: Ref<boolean> = ref(false)
 const toggle: Ref<boolean> = ref(false)
 const form: Ref<HTMLFormElement | null> = ref(null)
-const editForm: Ref<EditUsersForm> = ref(EditUsersHelper.buildFormData())
+const editForm: Ref<EditUsersForm> = ref({
+  id: '',
+  name: '',
+  birthday: new Date().toLocaleDateString('en-CA'),
+  email: '',
+  address: '',
+  username: ''
+})
 
 async function submit(e: MouseEvent) {
   try {
@@ -29,21 +36,22 @@ async function submit(e: MouseEvent) {
   }
 }
 
-onMounted(() => {
-  UsersService.findEditUsers()
-    .then((data) => {
-      editForm.value.id = data.id
-      editForm.value.birthday = data.birthday
-      editForm.value.email = data.email
-      editForm.value.address = data.address
-      editForm.value.username = data.username
-      editForm.value.name = data.name
-    })
-    .catch((e) => {
-      alert('server 異常，請重新登入')
-      console.error('異常', e)
-    })
-})
+async function initEditForm(): Promise<void> {
+  try {
+    const data = await UsersService.findEditUsers()
+    editForm.value.id = data.id
+    editForm.value.birthday = data.birthday
+    editForm.value.email = data.email
+    editForm.value.address = data.address
+    editForm.value.username = data.username
+    editForm.value.name = data.name
+  } catch (e) {
+    alert('server 異常，請重新登入')
+    console.error('異常', e)
+  }
+}
+
+onMounted(initEditForm)
 </script>
 
 <template>
@@ -78,7 +86,7 @@ onMounted(() => {
           density="compact"
           :readonly="!isEdit"
           v-model="editForm.name"
-          :rules="EditUsersHelper.getNameRules()"
+          :rules="UsersFormValidator.getNameRules()"
         />
         <div class="text-subtitle-1 text-medium-emphasis">出生日期</div>
         <v-text-field
@@ -98,7 +106,7 @@ onMounted(() => {
           placeholder="輸入電子信箱"
           :readonly="!isEdit"
           v-model="editForm.email"
-          :rules="EditUsersHelper.getEmailRules()"
+          :rules="UsersFormValidator.getEmailRules()"
         />
         <div class="text-subtitle-1 text-medium-emphasis">地址</div>
         <v-text-field
@@ -109,7 +117,7 @@ onMounted(() => {
           placeholder="輸入地址"
           :readonly="!isEdit"
           v-model="editForm.address"
-          :rules="EditUsersHelper.getAddressRules()"
+          :rules="UsersFormValidator.getAddressRules()"
         />
 
         <v-btn

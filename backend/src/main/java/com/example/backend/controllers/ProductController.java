@@ -39,5 +39,9 @@ public class ProductController {
         headers.setContentLength(img.length);
         return new ResponseEntity<>(img, headers, HttpStatus.OK);
     }
-    
+
+    @GetMapping("/public/product/name/{name}")
+    public ResponseEntity<List<ProductDto>> findByName(@PathVariable("name") String name) {
+        return ResponseEntity.ok(productService.findByName(name));
+    }
 }

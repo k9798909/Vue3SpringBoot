@@ -6,6 +6,9 @@ import type Users from '@/types/stores/Users'
 import type SignUpForm from '@/types/form/SignUpForm'
 import type EditUsersForm from '@/types/form/EditUsersForm'
 import type LoginResDto from '@/types/dto/LoginResDto'
+import type { AxiosError } from 'axios'
+import { NetworkErrorCode } from '@/common/HttpEnum'
+import { ViewMsg } from '@/common/MsgEnum'
 
 export async function login(loginDto: LoginDto): Promise<void> {
   await getHttp()
@@ -14,7 +17,13 @@ export async function login(loginDto: LoginDto): Promise<void> {
       useUsersStore().login(res.data, res.headers['authorization'])
     })
     .catch((err) => {
-      throw err
+      console.error('login error:', err)
+      let axiosError: AxiosError = err as AxiosError
+      if (NetworkErrorCode.Unauthorized == axiosError.response?.status) {
+        throw new Error(ViewMsg.InvalidUsernameOrPassword)
+      }
+
+      throw new Error(ViewMsg.ServerError)
     })
 }
 

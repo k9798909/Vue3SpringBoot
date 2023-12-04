@@ -3,6 +3,7 @@ package com.example.backend.Services;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,11 @@ public class ProductService {
     }
 
     public List<ProductDto> findAll() {
-        return productRepository.findAll().stream().map(conver()).toList();
+        return productRepository.findAll().stream().map(convert()).toList();
     }
 
     public ProductDto findByProId(String proId) {
-        return productRepository.findById(proId).stream().map(conver()).findAny()
+        return productRepository.findById(proId).stream().map(convert()).findAny()
                 .orElseThrow(() -> new NullPointerException("查無對應商品"));
     }
 
@@ -40,7 +41,11 @@ public class ProductService {
         return queryProImg.map(ProductImage::getImage).orElseThrow(() -> new RuntimeException("查無圖片"));
     }
 
-    private Function<Product, ProductDto> conver() {
+    public List<ProductDto> findByName(String name) {
+        return productRepository.findByNameContaining(name).stream().map(convert()).collect(Collectors.toList());
+    }
+
+    private Function<Product, ProductDto> convert() {
         return product -> new ProductDto(product.getId(), product.getName(), product.getDescription(),
                 product.getPrice(), product.getQuantity());
     }

@@ -1,20 +1,19 @@
 <script setup lang="ts">
 import * as CartService from '@/services/CartService'
-import { reactive, onMounted, ref } from 'vue'
+import { onMounted, ref, type Ref } from 'vue'
 import type CartProduct from '@/types/dto/CartProductDto'
 import * as OrdersService from '@/services/OrdersService'
 import { useRouter, type Router } from 'vue-router'
 
-let cart: CartProduct[] = []
-const state = reactive({ cart })
+const cart: Ref<CartProduct[]> = ref([])
 const message = ref('讀取中...')
 const router: Router = useRouter()
 
-async function loadCartProduct() {
+async function initProducts() {
   CartService.getCartProductList()
     .then((cartList) => {
-      state.cart.push(...cartList)
-      if (state.cart.length == 0) {
+      cart.value.push(...cartList)
+      if (cart.value.length == 0) {
         message.value = '購物車無商品'
       }
     })
@@ -26,13 +25,14 @@ async function loadCartProduct() {
 async function deleteCartProduct(e: MouseEvent, productId: string) {
   await CartService.deleteCartProduct(productId)
     .then((res) => {
-      state.cart = res.data
-      if (state.cart.length == 0) {
+      cart.value = res.data
+      if (cart.value.length == 0) {
         message.value = '購物車無商品'
       }
     })
     .catch((e) => {
       console.error('cartService deleteCartProduct error:', e)
+      alert('刪除失敗')
     })
 }
 
@@ -48,7 +48,7 @@ async function checkout() {
     })
 }
 
-onMounted(loadCartProduct)
+onMounted(initProducts)
 </script>
 
 <template>
@@ -63,7 +63,7 @@ onMounted(loadCartProduct)
           </v-col>
         </v-row>
 
-        <v-row v-for="dt in state.cart">
+        <v-row v-for="dt in cart">
           <v-col cols="12">
             <v-card border>
               <div class="d-flex flex-no-wrap justify-space-between">
@@ -92,7 +92,7 @@ onMounted(loadCartProduct)
           </v-col>
         </v-row>
 
-        <v-row v-if="state.cart.length > 0">
+        <v-row v-if="cart.length > 0">
           <v-col cols="12" class="d-flex flex-row-reverse">
             <v-btn class="mx-0" @click="checkout" append-icon="mdi-arrow-right-bold">結帳</v-btn>
           </v-col>
@@ -101,7 +101,7 @@ onMounted(loadCartProduct)
         <v-row>
           <v-col cols="12">
             <v-alert
-              v-if="state.cart.length == 0"
+              v-if="cart.length == 0"
               class="mb-5"
               density="compact"
               type="warning"

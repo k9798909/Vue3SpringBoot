@@ -7,14 +7,14 @@ const productViewName = 'product'
 const loginViewName = 'login'
 const indexViewName = 'index'
 const homeViewName = 'home'
-const SignUpViewName = 'signUp'
-const OrdersViewName = 'ordersView'
+const signUpViewName = 'signUp'
+const ordersViewName = 'ordersView'
 const notCheckLogin: string[] = [
   productViewName,
   loginViewName,
   indexViewName,
   homeViewName,
-  SignUpViewName
+  signUpViewName
 ]
 
 const router = createRouter({
@@ -43,7 +43,7 @@ const router = createRouter({
     {
       path: '/users',
       name: 'users',
-      component: () => import('../views/EditUsers/EditUsersView.vue')
+      component: () => import('../views/EditUsersView.vue')
     },
     {
       path: '/cart',
@@ -52,12 +52,12 @@ const router = createRouter({
     },
     {
       path: '/signUp',
-      name: SignUpViewName,
-      component: () => import('../views/SignUp/SignUpView.vue')
+      name: signUpViewName,
+      component: () => import('../views/SignUpView.vue')
     },
     {
       path: '/orders',
-      name: OrdersViewName,
+      name: ordersViewName,
       component: () => import('../views/OrdersView.vue')
     },
   ]
