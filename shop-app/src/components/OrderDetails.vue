@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { defineProps } from 'vue'
 import type { OrderDetailDto } from '@/types/dto/OrdersDto'
 
 const props = defineProps<{

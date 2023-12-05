@@ -22,12 +22,12 @@ CREATE TABLE product_image (
 
 CREATE TABLE users (
    id TEXT PRIMARY KEY DEFAULT LPAD(nextval('user_id_seq')::TEXT, 11, '0'),
-   username TEXT NOT NULL UNIQUE,
-   password TEXT NOT NULL,
-   name VARCHAR(255) NOT NULL,
-   birthday DATE NOT NULL,
-   email VARCHAR(255) NOT NULL,
-   address VARCHAR(255)
+   username TEXT NOT NULL CHECK (username <> '') UNIQUE,
+   password TEXT NOT NULL CHECK (password <> ''),
+   name VARCHAR(255) NOT NULL CHECK (name <> ''),
+   birthday DATE NOT NULL ,
+   email VARCHAR(255) NOT NULL CHECK (email <> ''),
+   address VARCHAR(255)  NOT NULL CHECK (address <> '')
 );
 
 CREATE TABLE orders (

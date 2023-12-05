@@ -10,9 +10,13 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "product")
+@NoArgsConstructor
+@Data
 public class Product implements Serializable {
     private static final long serialVersionUID = 1L;
     @Id
@@ -35,77 +39,5 @@ public class Product implements Serializable {
     private String upduser;
     @Column(name = "updtime")
     private LocalDateTime updtime;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getCrtuser() {
-        return crtuser;
-    }
-
-    public void setCrtuser(String crtuser) {
-        this.crtuser = crtuser;
-    }
-
-    public LocalDateTime getCrttime() {
-        return crttime;
-    }
-
-    public void setCrttime(LocalDateTime crttime) {
-        this.crttime = crttime;
-    }
-
-    public String getUpduser() {
-        return upduser;
-    }
-
-    public void setUpduser(String upduser) {
-        this.upduser = upduser;
-    }
-
-    public LocalDateTime getUpdtime() {
-        return updtime;
-    }
-
-    public void setUpdtime(LocalDateTime updtime) {
-        this.updtime = updtime;
-    }
 
 }

@@ -1,12 +1,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <footer class="footer">
+  <v-footer app absolute class="footer">
     <div class="container">
       <p class="mb-1">Released under the MIT License.</p>
       <p class="mb-1">Copyright © 2014-2023 Evan You</p>
     </div>
-  </footer>
+  </v-footer>
 </template>
 
 <style lang="scss" scoped>

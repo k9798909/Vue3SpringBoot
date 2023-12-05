@@ -4,7 +4,10 @@ import * as UsersFormValidator from '@/validators/UsersFormValidator'
 import * as UsersService from '@/services/UsersService'
 import type EditUsersForm from '@/types/form/EditUsersForm'
 import SuccessDialog from '@/components/SuccessDialog.vue'
+import axios, { type AxiosError } from 'axios'
+import type ResponseError from '@/types/http/ResponseError'
 
+const errorMessages: Ref<string> = ref('')
 const dialogShow = ref(false)
 const isEdit: Ref<boolean> = ref(false)
 const toggle: Ref<boolean> = ref(false)
@@ -21,16 +24,24 @@ const editForm: Ref<EditUsersForm> = ref({
 async function submit(e: MouseEvent) {
   try {
     e.preventDefault()
+    errorMessages.value = ''
 
-    const valid = (await form.value!.validate()).valid
-    if (!valid) {
-      return
-    }
+    // const valid = (await form.value!.validate()).valid
+    // if (!valid) {
+    //   return
+    // }
 
     await UsersService.updateForEditPage(editForm.value)
     isEdit.value = false
     dialogShow.value = true
   } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const axiosError: AxiosError<ResponseError> = error
+      if (axiosError.response?.data.fieldErrors) {
+        return
+      }
+    }
+
     console.error('修改失敗', error)
     alert('伺服器異常')
   }
@@ -131,6 +142,9 @@ onMounted(initEditForm)
         >
       </v-card>
     </v-form>
+    <div class="text-danger text-center">
+      <pre>{{ errorMessages }}</pre>
+    </div>
     <!--  成功視窗 [[ -->
     <SuccessDialog
       :dialogShow="dialogShow"

@@ -3,7 +3,7 @@ import { ContentTypeEnum } from '../common/HttpEnum'
 import * as UsersService from '@/services/UsersService'
 
 const getApiClient = (options = {}): AxiosInstance => {
-  return axios.create({
+  const instance = axios.create({
     baseURL: '/api',
     headers: {
       'Content-type': ContentTypeEnum.JSON,
@@ -11,6 +11,8 @@ const getApiClient = (options = {}): AxiosInstance => {
       ...options
     }
   })
+
+  return instance
 }
 
 export default getApiClient

@@ -49,35 +49,38 @@ public class UsersService implements UserDetailsService {
 
     public EditUsersRes findEditUsers(String usersname) {
         return findByUsername(usersname)
-                .map(users -> new EditUsersRes(
-                        users.getId(),
-                        users.getName(),
-                        users.getBirthday().format(DateTimeFormatter.ISO_DATE).toString(),
-                        users.getEmail(),
-                        users.getAddress(),
-                        users.getUsername()))
+                .map(users -> {
+                    EditUsersRes res = new EditUsersRes();
+                    res.setId(users.getId());
+                    res.setName(users.getName());
+                    res.setBirthday(users.getBirthday().format(DateTimeFormatter.ISO_DATE).toString());
+                    res.setEmail(users.getEmail());
+                    res.setAddress(users.getAddress());
+                    res.setUsername(users.getUsername());
+                    return res;
+                })
                 .orElseThrow(() -> new RuntimeException("找不到使用者"));
     }
 
     @Transactional
     public void save(SignUpReq req) {
         Users users = new Users();
-        users.setUsername(req.username());
-        users.setPassword(passwordEncoder.encode(req.password()));
-        users.setName(req.name());
-        users.setEmail(req.email());
-        users.setBirthday(LocalDate.parse(req.birthday(), DateTimeFormatter.ISO_DATE));
-        users.setAddress(req.address());
+        users.setUsername(req.getUsername());
+        users.setPassword(passwordEncoder.encode(req.getPassword()));
+        users.setName(req.getName());
+        users.setEmail(req.getEmail());
+        users.setBirthday(LocalDate.parse(req.getBirthday(), DateTimeFormatter.ISO_DATE));
+        users.setAddress(req.getAddress());
         usersRepository.save(users);
     }
 
     @Transactional
     public void update(EditUsersPostReq req) {
-        usersRepository.findById(req.id()).ifPresent(users -> {
-            users.setName(req.name());
-            users.setEmail(req.email());
-            users.setBirthday(LocalDate.parse(req.birthday(), DateTimeFormatter.ISO_DATE));
-            users.setAddress(req.address());
+        usersRepository.findById(req.getId()).ifPresent(users -> {
+            users.setName(req.getName());
+            users.setEmail(req.getEmail());
+            users.setBirthday(LocalDate.parse(req.getBirthday(), DateTimeFormatter.ISO_DATE));
+            users.setAddress(req.getAddress());
             usersRepository.save(users);
         });
     }

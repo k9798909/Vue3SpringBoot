@@ -35,14 +35,14 @@ public class CartService {
             cartList = new ArrayList<>();
         }
 
-        Optional<Cart> cart = cartList.stream().filter(t -> t.getProductId().equals(dto.productId())).findAny();
+        Optional<Cart> cart = cartList.stream().filter(t -> t.getProductId().equals(dto.getProductId())).findAny();
         if (cart.isPresent()) {
-            cart.get().setQuantity(cart.get().getQuantity() + dto.quantity());
+            cart.get().setQuantity(cart.get().getQuantity() + dto.getQuantity());
         } else {
             Cart newCart = new Cart();
             newCart.setUsername(username);
-            newCart.setProductId(dto.productId());
-            newCart.setQuantity(dto.quantity());
+            newCart.setProductId(dto.getProductId());
+            newCart.setQuantity(dto.getQuantity());
             cartList.add(newCart);
         }
         redisTemplate.opsForValue().set(username, cartList);

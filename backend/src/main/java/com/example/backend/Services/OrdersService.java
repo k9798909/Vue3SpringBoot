@@ -15,6 +15,7 @@ import com.example.backend.dto.OrderDetailsDto;
 import com.example.backend.dto.OrderDto;
 import com.example.backend.dto.ProductDto;
 import com.example.backend.enums.OrderStatus;
+import com.example.backend.exception.LogicRuntimeException;
 import com.example.backend.model.Cart;
 import com.example.backend.model.OrderDetail;
 import com.example.backend.model.Orders;
@@ -55,13 +56,29 @@ public class OrdersService {
 
             List<OrderDetailsDto> dts = t.getOrderDetails().stream().map(dt -> {
                 Product product = dt.getProduct();
-                ProductDto productDto = new ProductDto(product.getId(), product.getName(), product.getDescription(),
-                        product.getPrice(), product.getQuantity());
-                OrderDetailsDto dto = new OrderDetailsDto(productDto, dt.getQuantity(), dt.getPrice());
+
+                ProductDto productDto = new ProductDto();
+                productDto.setId(product.getId());
+                product.setName(product.getName());
+                product.setDescription(product.getDescription());
+                product.setPrice(product.getPrice());
+                product.setQuantity(product.getQuantity());
+
+                OrderDetailsDto dto = new OrderDetailsDto();
+                dto.setProductDto(productDto);
+                dto.setQuantity(dt.getQuantity());
+                dto.setPrice(dt.getPrice());
+
                 return dto;
             }).collect(Collectors.toList());
 
-            OrderDto dto = new OrderDto(t.getOrderId(), orderDate, t.getTotalPrice(), status, dts);
+            OrderDto dto = new OrderDto();
+            dto.setOrderId(t.getOrderId());
+            dto.setOrderDate(orderDate);
+            dto.setTotalPrice(t.getTotalPrice());
+            dto.setStatus(status);
+            dto.setOrderDetails(dts);
+
             return dto;
         }).collect(Collectors.toList());
 
@@ -71,12 +88,12 @@ public class OrdersService {
     @Transactional
     public void checkOut(String username) {
         Users users = usersService.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("找不到結帳者資訊"));
+                .orElseThrow(() -> new LogicRuntimeException("結帳者未登入"));
 
         var ops = redisTemplate.opsForValue().getOperations();
         List<Cart> cartList = ops.opsForValue().get(username);
         if (cartList == null || cartList.isEmpty()) {
-            throw new RuntimeException("找不到購物清單");
+            throw new LogicRuntimeException("購物清單內無商品");
         }
 
         // 訂單
@@ -90,7 +107,7 @@ public class OrdersService {
         List<OrderDetail> dts = cartList.stream()
                 .map(cart -> {
                     Product product = productRepository.findById(cart.getProductId())
-                            .orElseThrow(() -> new RuntimeException("找不到結帳商品 " + cart.getProductId() + " 資訊"));
+                            .orElseThrow(() -> new LogicRuntimeException("結帳商品 " + cart.getProductId() + " 資訊不存在"));
 
                     OrderDetailPK pk = new OrderDetailPK();
                     pk.setDetailId(count.addAndGet(1));

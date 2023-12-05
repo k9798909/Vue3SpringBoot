@@ -12,9 +12,13 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "order_details")
+@NoArgsConstructor
+@Data
 public class OrderDetail implements Serializable {
     private static final long serialVersionUID = 1L;
     @EmbeddedId
@@ -26,38 +30,6 @@ public class OrderDetail implements Serializable {
     private Integer quantity;
     @Column(name = "price")
     private BigDecimal price;
-
-    public OrderDetailPK getOrderId() {
-        return orderId;
-    }
-
-    public void setOrderId(OrderDetailPK orderId) {
-        this.orderId = orderId;
-    }
-
-    public Product getProduct() {
-        return product;
-    }
-
-    public void setProduct(Product product) {
-        this.product = product;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
 
     @Embeddable
     public static class OrderDetailPK implements Serializable {

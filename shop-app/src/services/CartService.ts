@@ -17,7 +17,7 @@ export async function getCartProductList(): Promise<CartProduct[]> {
   let cartDto: CartDto[] = (await getApiClient().get(`/cart`)).data
   for (let dto of cartDto) {
     try {
-      let product: ProductDto = (await ProductService.findBy(dto.productId)).data
+      let product: ProductDto = (await ProductService.findBy(dto.productId))
       cartProduct.push({
         productId: dto.productId,
         productName: product.name,

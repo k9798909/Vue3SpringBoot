@@ -46,8 +46,15 @@ public class ProductService {
     }
 
     private Function<Product, ProductDto> convert() {
-        return product -> new ProductDto(product.getId(), product.getName(), product.getDescription(),
-                product.getPrice(), product.getQuantity());
+        return product -> {
+            ProductDto dto = new ProductDto();
+            dto.setId(product.getId());
+            dto.setName(product.getName());
+            dto.setDescription(product.getDescription());
+            dto.setPrice(product.getPrice());
+            dto.setQuantity(product.getQuantity());
+            return dto;
+        };
     }
 
 }

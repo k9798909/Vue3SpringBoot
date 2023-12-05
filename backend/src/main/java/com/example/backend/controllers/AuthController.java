@@ -18,6 +18,8 @@ import com.example.backend.dto.TokenReq;
 import com.example.backend.model.Users;
 import com.example.backend.utils.JwtTokenUtils;
 
+import jakarta.validation.Valid;
+
 @RestController
 public class AuthController {
     private AuthenticationManager authenticationManager;
@@ -32,21 +34,25 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginRes> login(@RequestBody LoginReq req) {
+    public ResponseEntity<LoginRes> login(@Valid @RequestBody LoginReq req) {
         try {
             // 用ProviderManager進行認證
             Authentication authenticate = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(req.username(), req.password()));
+                    new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
 
             // principal 認證前:username 認證後:Users object、credentials 認證前:密碼
             // 認證後:null、authorities 認証前:null，認証後:權限
             Users users = (Users) authenticate.getPrincipal();
 
+            LoginRes res = new LoginRes();
+            res.setUsername(users.getUsername());
+            res.setName(users.getName());
+
             return ResponseEntity.ok()
                     .header(
                             HttpHeaders.AUTHORIZATION,
                             jwtTokenUtils.generateToken(users.getUsername()))
-                    .body(new LoginRes(users.getUsername(), users.getName()));
+                    .body(res);
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
@@ -54,7 +60,7 @@ public class AuthController {
 
     @PostMapping("/public/tokenVerify")
     public ResponseEntity<Boolean> tokenVerify(@RequestBody TokenReq req) {
-        return ResponseEntity.ok(usersService.tokenVerify(req.token()));
+        return ResponseEntity.ok(usersService.tokenVerify(req.getToken()));
     }
 
 }
