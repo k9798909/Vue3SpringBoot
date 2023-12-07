@@ -5,6 +5,8 @@ import type CartProduct from '@/types/dto/CartProductDto'
 import * as OrdersService from '@/services/OrdersService'
 import { useRouter, type Router } from 'vue-router'
 import * as NotificationUtils from '@/utils/NotificationUtils'
+import { handleUnauthorized } from '@/http'
+import { ViewMsg } from '@/common/MsgEnum'
 
 const cart: Ref<CartProduct[]> = ref([])
 const message = ref('讀取中...')
@@ -18,8 +20,12 @@ async function initProducts() {
         message.value = '購物車無商品'
       }
     })
-    .catch((e) => {
-      console.error('cartService getCartList error:', e)
+    .catch((error) => {
+      if (handleUnauthorized(error)) {
+        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
+        return
+      }
+      console.error('cartService getCartList error:', error)
     })
 }
 
@@ -32,9 +38,13 @@ async function deleteCartProduct(e: MouseEvent, productId: string) {
         message.value = '購物車無商品'
       }
     })
-    .catch((e) => {
+    .catch((error) => {
+      if (handleUnauthorized(error)) {
+        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
+        return
+      }
       console.error('cartService deleteCartProduct error:', e)
-      alert('刪除失敗')
+      NotificationUtils.showErrorNotification(ViewMsg.ServerError)
     })
 }
 
@@ -71,7 +81,7 @@ onMounted(initProducts)
               <div class="d-flex flex-no-wrap justify-space-between">
                 <div>
                   <v-card-title class="text-h5"> {{ dt.productName }} </v-card-title>
-                  <v-card-subtitle>${{ dt.price }}</v-card-subtitle>
+                  <v-card-subtitle>${{ dt.price }} 數量:{{ dt.quantity }}</v-card-subtitle>
                   <v-card-actions>
                     <v-btn
                       class="ms-2"

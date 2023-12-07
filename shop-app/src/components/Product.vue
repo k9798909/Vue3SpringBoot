@@ -1,14 +1,13 @@
 <script setup lang="ts">
-import NotLoginError from '@/common/NotLoginError'
 import * as CartService from '@/services/CartService'
 import type ProductDto from '@/types/dto/ProductDto'
-import { useRouter } from 'vue-router'
 import * as NotificationUtils from '@/utils/NotificationUtils'
+import { handleUnauthorized } from '@/http'
+import { ViewMsg } from '@/common/MsgEnum'
 export interface Prop {
   product: ProductDto
 }
 
-const router = useRouter()
 const props = defineProps<Prop>()
 const imgUrl = `/api/public/product/img/${props.product.id}`
 
@@ -17,15 +16,12 @@ async function addCardProduct(): Promise<void> {
     .then(() => {
       NotificationUtils.showSuccessNotification('加入購物車成功')
     })
-    .catch((e) => {
-      if (e instanceof NotLoginError) {
-        NotificationUtils.showWaringNotification('請登入後再加入購物車')
-        router.push('/login')
+    .catch((error) => {
+      if (handleUnauthorized(error)) {
+        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
         return
       }
-
-      NotificationUtils.showErrorNotification('加入購物車失敗')
-      console.error('addCardProduct error', e)
+      console.error('addCardProduct error', error)
     })
 }
 

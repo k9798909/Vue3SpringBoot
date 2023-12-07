@@ -3,9 +3,22 @@ import { ContentTypeEnum, NetworkErrorCode } from '../common/HttpEnum'
 import * as UsersService from '@/services/UsersService'
 import type ResponseError from '@/types/http/ResponseError'
 import useStore from '@/stores/UseStore'
+import router from '@/router'
 
+// 建立一個axios實體，並設定預設的baseURL、header、interceptors。
 const getApiClient = (options = {}): AxiosInstance => {
-  const instance = axios.create({
+  // 建立axios實體
+  const instance: AxiosInstance = createInstance(options)
+  // 設定req攔截器啟動遮罩
+  requestInterceptors(instance)
+  // 設定res攔截器關閉遮罩
+  responseInterceptors(instance)
+  return instance
+}
+
+//建立axios實體
+function createInstance(options = {}): AxiosInstance {
+  return axios.create({
     baseURL: '/api',
     headers: {
       'Content-type': ContentTypeEnum.JSON,
@@ -13,7 +26,10 @@ const getApiClient = (options = {}): AxiosInstance => {
       ...options
     }
   })
+}
 
+// 設定req攔截器啟動遮罩
+function requestInterceptors(instance: AxiosInstance) {
   instance.interceptors.request.use(
     function (config) {
       if (config.method === 'post' || config.method === 'put' || config.method === 'delete') {
@@ -25,23 +41,28 @@ const getApiClient = (options = {}): AxiosInstance => {
       return Promise.reject(error)
     }
   )
+}
+
+// 設定res攔截器關閉遮罩
+function responseInterceptors(instance: AxiosInstance) {
+  const hideOverlay = () => {
+    useStore().hideOverlay()
+  }
 
   instance.interceptors.response.use(
     function (response) {
-      setTimeout(() => {
-        useStore().hideOverlay()
-      }, 500)
+      hideOverlay()
       return response
     },
     function (error) {
+      hideOverlay()
+      console.error(error)
       return Promise.reject(error)
     }
   )
-
-  return instance
 }
 
-//如果回傳400而且fieldErrors有值，就回傳錯誤訊息。
+//如果回傳400而且fieldErrors有值，就回傳錯誤欄位物件。
 export function getFieldErrors<T>(error: any): T | undefined {
   if (!axios.isAxiosError(error)) {
     return
@@ -57,6 +78,16 @@ export function getFieldErrors<T>(error: any): T | undefined {
   }
 
   return axiosError.response.data.fieldErrors
+}
+
+// 處理未授權或未登入統一跳轉到登入頁面並且記錄當前頁面，登入之後跳轉到紀錄頁面。
+export function handleUnauthorized(error: any) {
+  const handle = isUnauthorized(error)
+  if (handle) {
+    useStore().setBeforeLoginUrl(router.currentRoute.value.fullPath)
+    router.push('/login')
+  }
+  return handle
 }
 
 //是否為未授權或輸入的帳號密碼錯誤。

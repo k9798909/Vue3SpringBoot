@@ -6,13 +6,14 @@ import type { LoginForm, LoginValidationMessages } from '@/types/form/LoginForm'
 import { useRouter, type Router } from 'vue-router'
 import { getFieldErrors, isUnauthorized } from '@/http'
 import * as NotificationUtils from '@/utils/NotificationUtils'
+import useStore from '@/stores/UseStore'
+import { ViewMsg } from '@/common/MsgEnum'
 
 const router: Router = useRouter()
 //密碼能見度
 const visible: Ref<boolean> = ref(false)
 //session訊息用完移除
-const msg: Ref<string> = ref(sessionStorage.getItem(ConstantKey.LOGIN_SESSION_MSG) || '')
-sessionStorage.removeItem(ConstantKey.LOGIN_SESSION_MSG)
+const msg: Ref<string> = ref('')
 const form: Ref<HTMLFormElement | null> = ref(null)
 
 const loginForm: Ref<LoginForm> = ref({
@@ -35,7 +36,9 @@ const loginEvent = async () => {
 
   UsersService.login(loginForm.value)
     .then(() => {
-      router.push('/index')
+      const toUrl = useStore().getBeforeLoginUrl
+      useStore().clearBeforeLoginUrl()
+      router.push(toUrl || '/index')
     })
     .catch((error) => {
       const fieldErrors = getFieldErrors<LoginValidationMessages>(error)
@@ -50,7 +53,7 @@ const loginEvent = async () => {
       }
 
       console.error('server error', error)
-      NotificationUtils.showErrorNotification('系統錯誤，請稍後再試。')
+      NotificationUtils.showErrorNotification(ViewMsg.ServerError)
     })
 }
 </script>

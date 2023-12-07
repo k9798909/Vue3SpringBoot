@@ -2,6 +2,8 @@ import { createRouter, createWebHistory, type RouteLocationNormalized } from 'vu
 import HomeView from '../views/HomeView.vue'
 import * as UsersService from '@/services/UsersService'
 import * as NotificationUtils from '@/utils/NotificationUtils'
+import useStore from '@/stores/UseStore'
+import { ViewMsg } from '@/common/MsgEnum'
 
 const productViewName = 'product'
 const loginViewName = 'login'
@@ -86,11 +88,12 @@ async function loginCheck(to: RouteLocationNormalized, from: RouteLocationNormal
       return
     }
 
-    NotificationUtils.showWaringNotification('請登入使用者帳號')
+    useStore().setBeforeLoginUrl(to.fullPath)
+    NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
     return '/login'
   } catch (error) {
     console.error('loginCheck error', error)
-    NotificationUtils.showErrorNotification('系統錯誤請重新登入')
+    NotificationUtils.showErrorNotification('請重新進行使用者登入')
     return '/login'
   }
 }
