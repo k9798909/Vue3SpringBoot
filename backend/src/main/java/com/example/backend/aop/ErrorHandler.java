@@ -1,6 +1,8 @@
 package com.example.backend.aop;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -33,10 +36,7 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(CustomArgumentNotValidException.class)
     protected ResponseEntity<ErrorRes> handleCustomArgumentNotValid(CustomArgumentNotValidException ex,
             WebRequest request) {
-        Map<String, String> map = new HashMap<>();
-        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            map.put(fieldError.getField(), fieldError.getDefaultMessage());
-        }
+        Map<String, List<String>> map = getFieldErrors(ex.getBindingResult());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorRes("Argument Not Valid", map));
     }
 
@@ -51,15 +51,21 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        Map<String, String> map = new HashMap<>();
-        for (FieldError fieldError : ex.getBindingResult().getFieldErrors()) {
-            map.put(fieldError.getField(), fieldError.getDefaultMessage());
-        }
+        Map<String, List<String>> map = getFieldErrors(ex.getBindingResult());
         return handleExceptionInternal(ex, new ErrorRes("Argument Not Valid", map), headers, HttpStatus.BAD_REQUEST,
                 request);
     }
 
-    private static record ErrorRes(String message, Map<String, String> fieldErrors) {
+    // 取得錯誤欄位及訊息
+    private Map<String, List<String>> getFieldErrors(BindingResult result) {
+        Map<String, List<String>> map = new HashMap<>();
+        for (FieldError fieldError : result.getFieldErrors()) {
+            map.computeIfAbsent(fieldError.getField(), k -> new ArrayList<>()).add(fieldError.getDefaultMessage());
+        }
+        return map;
+    }
+
+    private static record ErrorRes(String message, Map<String, List<String>> fieldErrors) {
     }
 
 }

@@ -1,4 +1,4 @@
-export default interface SignUpForm {
+export interface SignUpForm {
   name: string
   birthday: string
   email: string
@@ -6,4 +6,13 @@ export default interface SignUpForm {
   username: string
   password: string
   chkPassword: string
+}
+
+export interface SignUpValidMessage {
+  name: string[]
+  email: string[]
+  address: string[]
+  username: string[]
+  password: string[]
+  chkPassword: string[]
 }

@@ -2,12 +2,11 @@
 import { onMounted, ref, type Ref } from 'vue'
 import * as UsersFormValidator from '@/validators/UsersFormValidator'
 import * as UsersService from '@/services/UsersService'
-import type EditUsersForm from '@/types/form/EditUsersForm'
+import type { EditUsersForm, EditUsersValidMessage } from '@/types/form/EditUsersForm'
 import SuccessDialog from '@/components/SuccessDialog.vue'
-import axios, { type AxiosError } from 'axios'
-import type ResponseError from '@/types/http/ResponseError'
+import { getFieldErrors } from '@/http'
+import * as NotificationUtils from '@/utils/NotificationUtils'
 
-const errorMessages: Ref<string> = ref('')
 const dialogShow = ref(false)
 const isEdit: Ref<boolean> = ref(false)
 const toggle: Ref<boolean> = ref(false)
@@ -20,30 +19,34 @@ const editForm: Ref<EditUsersForm> = ref({
   address: '',
   username: ''
 })
+const editUsersValidMessage: Ref<EditUsersValidMessage> = ref({
+  name: [],
+  birthday: [],
+  email: [],
+  address: []
+})
 
 async function submit(e: MouseEvent) {
   try {
     e.preventDefault()
-    errorMessages.value = ''
 
-    // const valid = (await form.value!.validate()).valid
-    // if (!valid) {
-    //   return
-    // }
+    const valid = (await form.value!.validate()).valid
+    if (!valid) {
+      return
+    }
 
     await UsersService.updateForEditPage(editForm.value)
     isEdit.value = false
     dialogShow.value = true
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      const axiosError: AxiosError<ResponseError> = error
-      if (axiosError.response?.data.fieldErrors) {
-        return
-      }
+    const fieldErrors = getFieldErrors<EditUsersValidMessage>(error)
+    if (fieldErrors) {
+      editUsersValidMessage.value = fieldErrors
+      return
     }
 
-    console.error('修改失敗', error)
-    alert('伺服器異常')
+    console.error('server error', error)
+    NotificationUtils.showErrorNotification('系統錯誤，請稍後再試。')
   }
 }
 
@@ -56,9 +59,9 @@ async function initEditForm(): Promise<void> {
     editForm.value.address = data.address
     editForm.value.username = data.username
     editForm.value.name = data.name
-  } catch (e) {
-    alert('server 異常，請重新登入')
-    console.error('異常', e)
+  } catch (error) {
+    console.error('server error', error)
+    NotificationUtils.showErrorNotification('系統錯誤，請稍後再試。')
   }
 }
 
@@ -98,6 +101,7 @@ onMounted(initEditForm)
           :readonly="!isEdit"
           v-model="editForm.name"
           :rules="UsersFormValidator.getNameRules()"
+          :error-messages="editUsersValidMessage.name"
         />
         <div class="text-subtitle-1 text-medium-emphasis">出生日期</div>
         <v-text-field
@@ -118,6 +122,7 @@ onMounted(initEditForm)
           :readonly="!isEdit"
           v-model="editForm.email"
           :rules="UsersFormValidator.getEmailRules()"
+          :error-messages="editUsersValidMessage.email"
         />
         <div class="text-subtitle-1 text-medium-emphasis">地址</div>
         <v-text-field
@@ -129,6 +134,7 @@ onMounted(initEditForm)
           :readonly="!isEdit"
           v-model="editForm.address"
           :rules="UsersFormValidator.getAddressRules()"
+          :error-messages="editUsersValidMessage.address"
         />
 
         <v-btn
@@ -142,9 +148,6 @@ onMounted(initEditForm)
         >
       </v-card>
     </v-form>
-    <div class="text-danger text-center">
-      <pre>{{ errorMessages }}</pre>
-    </div>
     <!--  成功視窗 [[ -->
     <SuccessDialog
       :dialogShow="dialogShow"

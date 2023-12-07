@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory, type RouteLocationNormalized } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import * as UsersService from '@/services/UsersService'
-import { ConstantKey } from '@/common/ConstantKey'
+import * as NotificationUtils from '@/utils/NotificationUtils'
 
 const productViewName = 'product'
 const loginViewName = 'login'
@@ -59,7 +59,7 @@ const router = createRouter({
       path: '/orders',
       name: ordersViewName,
       component: () => import('../views/OrdersView.vue')
-    },
+    }
   ]
 })
 
@@ -86,11 +86,11 @@ async function loginCheck(to: RouteLocationNormalized, from: RouteLocationNormal
       return
     }
 
-    sessionStorage.setItem(ConstantKey.LOGIN_SESSION_MSG, '請登入使用者帳號')
+    NotificationUtils.showWaringNotification('請登入使用者帳號')
     return '/login'
   } catch (error) {
     console.error('loginCheck error', error)
-    sessionStorage.setItem(ConstantKey.LOGIN_SESSION_MSG, '發生錯誤請重新登入')
+    NotificationUtils.showErrorNotification('系統錯誤請重新登入')
     return '/login'
   }
 }

@@ -7,9 +7,13 @@ import { ConstantKey } from '@/common/ConstantKey'
 
 const useUsersStore = defineStore('usersStore', {
   state: () => {
-    const $cookies: VueCookies = inject<VueCookies>('$cookies')!
-    let users: Users | null = $cookies.get(ConstantKey.USERS_KEY)
-    return { users, $cookies }
+    const store: Storage = localStorage
+    let users: Users | null = null
+    const usersString = store.getItem(ConstantKey.USERS_KEY)
+    if (usersString) {
+      users = JSON.parse(usersString)
+    }
+    return { users, store }
   },
   getters: {
     getUsers: (state) => state.users
@@ -17,11 +21,11 @@ const useUsersStore = defineStore('usersStore', {
   actions: {
     login(loginRes: LoginResDto, token: string) {
       this.users = { ...loginRes, token }
-      this.$cookies.set(ConstantKey.USERS_KEY, JSON.stringify(this.users))
+      this.store.setItem(ConstantKey.USERS_KEY, JSON.stringify(this.users))
     },
     logout() {
       this.users = null
-      this.$cookies.remove(ConstantKey.USERS_KEY)
+      this.store.removeItem(ConstantKey.USERS_KEY)
     }
   }
 })

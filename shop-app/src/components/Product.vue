@@ -3,26 +3,28 @@ import NotLoginError from '@/common/NotLoginError'
 import * as CartService from '@/services/CartService'
 import type ProductDto from '@/types/dto/ProductDto'
 import { useRouter } from 'vue-router'
+import * as NotificationUtils from '@/utils/NotificationUtils'
 export interface Prop {
   product: ProductDto
-  successAlert: boolean
 }
 
 const router = useRouter()
 const props = defineProps<Prop>()
-const emit = defineEmits(['update:successAlert'])
 const imgUrl = `/api/public/product/img/${props.product.id}`
 
 async function addCardProduct(): Promise<void> {
   CartService.updateCartProduct(props.product.id, 1)
     .then(() => {
-      emit('update:successAlert', true)
+      NotificationUtils.showSuccessNotification('加入購物車成功')
     })
     .catch((e) => {
       if (e instanceof NotLoginError) {
+        NotificationUtils.showWaringNotification('請登入後再加入購物車')
         router.push('/login')
         return
       }
+
+      NotificationUtils.showErrorNotification('加入購物車失敗')
       console.error('addCardProduct error', e)
     })
 }

@@ -17,7 +17,7 @@ export async function getCartProductList(): Promise<CartProduct[]> {
   let cartDto: CartDto[] = (await getApiClient().get(`/cart`)).data
   for (let dto of cartDto) {
     try {
-      let product: ProductDto = (await ProductService.findBy(dto.productId))
+      let product: ProductDto = await ProductService.findBy(dto.productId)
       cartProduct.push({
         productId: dto.productId,
         productName: product.name,
@@ -52,11 +52,28 @@ export async function updateCartProduct(productId: string, quantity: number): Pr
   await getApiClient().post('/cart', updCart)
 }
 
-export async function deleteCartProduct(productId: String): Promise<ResponseData<CartProduct[]>> {
+export async function deleteCartProduct(productId: String): Promise<CartProduct[]> {
   const users = UsersService.getStoreUsers()
   if (!users) {
     throw new NotLoginError('未登入')
   }
 
-  return await getApiClient().delete(`/cart/${productId}`)
+  let cartProduct: CartProduct[] = []
+  let cartDto: CartDto[] = (await getApiClient().delete(`/cart/${productId}`)).data
+  for (let dto of cartDto) {
+    try {
+      let product: ProductDto = await ProductService.findBy(dto.productId)
+      cartProduct.push({
+        productId: dto.productId,
+        productName: product.name,
+        price: product.price,
+        quantity: 1,
+        imgUrl: `/api/public/product/img/${dto.productId}`
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  return cartProduct
 }

@@ -3,11 +3,9 @@ import Product from '../components/Product.vue'
 import { onMounted, ref, type Ref } from 'vue'
 import * as ProductService from '@/services/ProductService'
 import type ProductDto from '@/types/dto/ProductDto'
-import SuccessDialog from '@/components/SuccessDialog.vue'
 
 const searchInput: Ref<string> = ref('')
 const products: Ref<ProductDto[]> = ref([])
-const successAlert: Ref<boolean> = ref(false)
 
 async function initProductList(): Promise<void> {
   ProductService.findAll()
@@ -68,21 +66,11 @@ onMounted(initProductList)
     <v-container v-if="products.length != 0" min-width="500px">
       <v-row>
         <v-col cols="12" lg="3" md="4" sm="6" v-for="product in products">
-          <Product class="mx-auto" :product="product" v-model:successAlert="successAlert"></Product>
+          <Product class="mx-auto" :product="product"></Product>
         </v-col>
       </v-row>
       <v-pagination :length="1"></v-pagination>
     </v-container>
-
-    <!--  成功視窗 [[ -->
-    <SuccessDialog
-      :dialogShow="successAlert"
-      title="加入購物車成功"
-      btnName="確定"
-      content="加入購物車成功，請至購物車頁面查看。"
-      :btnFunction="() => (successAlert = !successAlert)"
-    />
-    <!--  ]] -->
   </main>
 </template>
 <style lang="scss" scoped></style>

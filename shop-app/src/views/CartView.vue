@@ -4,6 +4,7 @@ import { onMounted, ref, type Ref } from 'vue'
 import type CartProduct from '@/types/dto/CartProductDto'
 import * as OrdersService from '@/services/OrdersService'
 import { useRouter, type Router } from 'vue-router'
+import * as NotificationUtils from '@/utils/NotificationUtils'
 
 const cart: Ref<CartProduct[]> = ref([])
 const message = ref('讀取中...')
@@ -23,9 +24,10 @@ async function initProducts() {
 }
 
 async function deleteCartProduct(e: MouseEvent, productId: string) {
-  await CartService.deleteCartProduct(productId)
+  CartService.deleteCartProduct(productId)
     .then((res) => {
-      cart.value = res.data
+      console.log('deleteCartProduct res:', res)
+      cart.value = res
       if (cart.value.length == 0) {
         message.value = '購物車無商品'
       }
@@ -39,11 +41,11 @@ async function deleteCartProduct(e: MouseEvent, productId: string) {
 async function checkout() {
   OrdersService.checkout()
     .then((res) => {
-      alert('結帳成功')
+      NotificationUtils.showSuccessNotification('結帳成功')
       router.push('/orders')
     })
     .catch((e) => {
-      alert('結帳失敗')
+      NotificationUtils.showErrorNotification('結帳失敗')
       console.error(e)
     })
 }

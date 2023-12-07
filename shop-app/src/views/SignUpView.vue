@@ -2,9 +2,11 @@
 import { ref, type Ref } from 'vue'
 import * as UsersService from '@/services/UsersService'
 import * as UsersFormValidator from '@/validators/UsersFormValidator'
-import type SignUpForm from '@/types/form/SignUpForm'
+import type { SignUpForm, SignUpValidMessage } from '@/types/form/SignUpForm'
 import { useRouter, type Router } from 'vue-router'
 import SuccessDialog from '@/components/SuccessDialog.vue'
+import { getFieldErrors } from '@/http'
+import * as NotificationUtils from '@/utils/NotificationUtils'
 
 const router: Router = useRouter()
 let dialogShow: Ref<boolean> = ref(false)
@@ -17,6 +19,15 @@ const formParams: Ref<SignUpForm> = ref({
   username: '',
   password: '',
   chkPassword: ''
+})
+const validMessage: Ref<SignUpValidMessage> = ref({
+  name: [],
+  birthday: [],
+  email: [],
+  address: [],
+  username: [],
+  password: [],
+  chkPassword: []
 })
 
 async function submit(e: MouseEvent) {
@@ -31,8 +42,14 @@ async function submit(e: MouseEvent) {
     await UsersService.signUp(formParams.value)
     dialogShow.value = true
   } catch (error) {
-    console.error('註冊失敗', error)
-    alert('伺服器異常')
+    const fieldErrors = getFieldErrors<SignUpValidMessage>(error)
+    if (fieldErrors) {
+      validMessage.value = fieldErrors
+      return
+    }
+
+    console.error('server error', error)
+    NotificationUtils.showErrorNotification('系統錯誤，請稍後再試。')
   }
 }
 </script>
@@ -51,6 +68,7 @@ async function submit(e: MouseEvent) {
           variant="outlined"
           density="compact"
           :rules="UsersFormValidator.getUsernameRules()"
+          :errorMessages="validMessage.username"
         />
         <div class="text-subtitle-1 text-medium-emphasis">密碼</div>
         <v-text-field
@@ -61,6 +79,7 @@ async function submit(e: MouseEvent) {
           variant="outlined"
           density="compact"
           :rules="UsersFormValidator.getPasswordRules()"
+          :errorMessages="validMessage.password"
         />
         <div class="text-subtitle-1 text-medium-emphasis">密碼複驗</div>
         <v-text-field
@@ -74,6 +93,7 @@ async function submit(e: MouseEvent) {
             ...UsersFormValidator.getChkPasswordRules(),
             (v) => v === formParams.password || '密碼複驗需與上方密碼相同'
           ]"
+          :errorMessages="validMessage.chkPassword"
         />
         <div class="text-subtitle-1 text-medium-emphasis">姓名</div>
         <v-text-field
@@ -84,6 +104,7 @@ async function submit(e: MouseEvent) {
           variant="outlined"
           density="compact"
           :rules="UsersFormValidator.getNameRules()"
+          :errorMessages="validMessage.name"
         />
         <div class="text-subtitle-1 text-medium-emphasis">出生日期</div>
         <v-text-field
@@ -102,6 +123,7 @@ async function submit(e: MouseEvent) {
           density="compact"
           placeholder="輸入電子信箱"
           :rules="UsersFormValidator.getEmailRules()"
+          :errorMessages="validMessage.email"
         />
         <div class="text-subtitle-1 text-medium-emphasis">地址</div>
         <v-text-field
@@ -112,6 +134,7 @@ async function submit(e: MouseEvent) {
           density="compact"
           placeholder="輸入地址"
           :rules="UsersFormValidator.getAddressRules()"
+          :errorMessages="validMessage.address"
         />
 
         <v-btn

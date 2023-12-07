@@ -1,4 +1,4 @@
-export default interface ResponseError {
+export default interface ResponseError<T> {
   message: string
-  fieldErrors: any
+  fieldErrors: T
 }

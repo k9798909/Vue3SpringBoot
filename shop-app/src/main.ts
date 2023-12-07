@@ -3,8 +3,8 @@ import App from './App.vue'
 import router from './router'
 import { createPinia } from 'pinia'
 
-//VueCookies
-import VueCookies from 'vue-cookies'
+// Notifications
+import Notifications from '@kyvg/vue3-notification'
 
 // Vuetify
 import 'vuetify/styles'
@@ -25,5 +25,5 @@ const app = createApp(App)
 app.use(router)
 app.use(vuetify)
 app.use(createPinia())
-app.use(VueCookies, { expires: '1h', path: '/', domain: '', secure: true, sameSite: 'Lax' })
+app.use(Notifications)
 app.mount('#app')

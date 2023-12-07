@@ -59,10 +59,10 @@ public class OrdersService {
 
                 ProductDto productDto = new ProductDto();
                 productDto.setId(product.getId());
-                product.setName(product.getName());
-                product.setDescription(product.getDescription());
-                product.setPrice(product.getPrice());
-                product.setQuantity(product.getQuantity());
+                productDto.setName(product.getName());
+                productDto.setDescription(product.getDescription());
+                productDto.setPrice(product.getPrice());
+                productDto.setQuantity(product.getQuantity());
 
                 OrderDetailsDto dto = new OrderDetailsDto();
                 dto.setProductDto(productDto);
