@@ -46,7 +46,9 @@ function requestInterceptors(instance: AxiosInstance) {
 // 設定res攔截器關閉遮罩
 function responseInterceptors(instance: AxiosInstance) {
   const hideOverlay = () => {
-    useStore().hideOverlay()
+    setTimeout(() => {
+      useStore().hideOverlay()
+    }, 100)
   }
 
   instance.interceptors.response.use(

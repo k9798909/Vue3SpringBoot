@@ -5,10 +5,10 @@ import Overlay from '@/components/Overlay.vue'
 </script>
 
 <template>
-  <v-layout>
+  <v-layout class="rounded rounded-md">
     <Header></Header>
-    <v-main class="w-100">
-      <router-view class="main"></router-view>
+    <v-main class="main">
+      <router-view class="w-100 py-5"></router-view>
     </v-main>
     <Footer></Footer>
     <notifications :classes="['custom-vue-notification']" position="bottom right" max="1" />
@@ -18,7 +18,6 @@ import Overlay from '@/components/Overlay.vue'
 
 <style lang="scss" scoped>
 .main {
-  min-height: 80vh;
-  padding: 1rem;
+  min-height: 100vh;
 }
 </style>

@@ -32,7 +32,6 @@ async function initProducts() {
 async function deleteCartProduct(e: MouseEvent, productId: string) {
   CartService.deleteCartProduct(productId)
     .then((res) => {
-      console.log('deleteCartProduct res:', res)
       cart.value = res
       if (cart.value.length == 0) {
         message.value = '購物車無商品'

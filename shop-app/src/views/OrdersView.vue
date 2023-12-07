@@ -56,8 +56,8 @@ onMounted(initOrders)
       </v-col>
     </v-container>
     <!--  訂單明細視窗 [[ -->
-    <v-dialog v-model="dialogShow" width="50%" :absolute="true">
-      <OrderDetails :order-details="orderDetails" @dialog-false="dialogFalse" />
+    <v-dialog v-model="dialogShow" :fullscreen="true" content-class="pt-5">
+      <OrderDetails class="w-50" :order-details="orderDetails" @dialog-false="dialogFalse" />
     </v-dialog>
     <!--  ]] -->
   </div>
