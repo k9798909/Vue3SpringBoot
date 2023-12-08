@@ -1,8 +1,6 @@
 import { defineStore } from 'pinia'
 import type Users from '@/types/stores/Users'
 import type LoginResDto from '@/types/dto/LoginResDto'
-import { inject } from 'vue'
-import type { VueCookies } from 'vue-cookies'
 import { ConstantKey } from '@/common/ConstantKey'
 
 const useUsersStore = defineStore('usersStore', {

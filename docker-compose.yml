@@ -17,3 +17,18 @@ services:
       - '6379:6379'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
+  backend-service:
+    build: ./backend
+    image: backend-service
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+      - redis
+  shop-app:
+      build: ./shop-app
+      image: shop-app
+      ports:
+        - 5173:5173
+      depends_on:
+        - backend-service

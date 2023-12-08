@@ -19,7 +19,6 @@
     "pinia": "^2.0.36",
     "vee-validate": "^4.11.6",
     "vue": "^3.3.4",
-    "vue-cookies": "^1.8.3",
     "vue-router": "^4.1.6",
     "vuetify": "^3.3.14"
   },
