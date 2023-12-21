@@ -3,8 +3,6 @@ services:
   postgres:
     container_name: postgres
     image: k9798909/postgres
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -17,15 +15,13 @@ services:
   backend-service:
     container_name: backend-service
     image: k9798909/backend-service
-    ports:
-      - 8080:8080
     depends_on:
       - postgres
       - redis
   shop-app:
-      container_name: shop-app
-      image: k9798909/shop-app
-      ports:
-        - 80:5173
-      depends_on:
-        - backend-service
+    container_name: shop-app
+    image: k9798909/shop-app
+    ports:
+      - 8080:8080
+    depends_on:
+      - backend-service

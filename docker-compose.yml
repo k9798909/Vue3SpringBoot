@@ -4,8 +4,6 @@ services:
     container_name: postgres
     build: ./postgres
     image: postgres
-    ports:
-      - "5432:5432"
     environment:
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
@@ -14,16 +12,12 @@ services:
     container_name: redis
     build: ./redis
     image: redis
-    ports:
-      - '6379:6379'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
   backend-service:
     container_name: backend-service
     build: ./backend
     image: backend-service
-    ports:
-      - 8080:8080
     depends_on:
       - postgres
       - redis
@@ -32,6 +26,6 @@ services:
     build: ./shop-app
     image: shop-app
     ports:
-      - 80:5173
+      - 8080:8080
     depends_on:
       - backend-service

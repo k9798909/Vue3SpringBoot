@@ -7,6 +7,6 @@ RUN mvn -f /home/app/pom.xml clean package -Pprod -Dmaven.test.skip
 FROM openjdk:21-jdk AS production-stage
 WORKDIR /app
 COPY --from=build-stage /home/app/target/backend-service.jar .
-ENV PORT=8080
-EXPOSE 8080
+ENV PORT=8088
+EXPOSE 8088
 CMD ["java", "-jar","-Dspring.profiles.active=prod", "backend-service.jar"]
