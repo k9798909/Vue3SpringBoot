@@ -1,8 +1,7 @@
 version: "1"
 services:
   postgres:
-    build: ./postgres
-    image: postgres
+    image: k9798909/postgres
     ports:
       - "5432:5432"
     environment:
@@ -16,16 +15,14 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
   backend-service:
-    build: ./backend
-    image: backend-service
+    image: k9798909/backend-service
     ports:
       - 8080:8080
     depends_on:
       - postgres
       - redis
   shop-app:
-      build: ./shop-app
-      image: shop-app
+      image: k9798909/shop-app
       ports:
         - 5173:5173
       depends_on:
