@@ -12,8 +12,6 @@ services:
   redis:
     container_name: redis
     image: k9798909/redis
-    ports:
-      - '6379:6379'
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
   backend-service:
