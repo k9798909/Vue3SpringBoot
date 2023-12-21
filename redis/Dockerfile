@@ -1,0 +1,1 @@
+from redis:7.0.8-alpine

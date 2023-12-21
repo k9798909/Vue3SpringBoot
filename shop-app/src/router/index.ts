@@ -70,17 +70,17 @@ router.beforeEach(loginCheck)
 //檢查是否有登入或逾期
 async function loginCheck(to: RouteLocationNormalized, from: RouteLocationNormalized) {
   try {
+    //頁面是否需要驗證
+    if (notCheckLogin.includes(to.name!.toString())) {
+      return
+    }
+
     const token = UsersService.getStoreUsers()?.token || ''
     const isVerify = await UsersService.verifyToken(token)
 
     //確定token是否過期如果過期將token刪除
     if (!isVerify) {
       UsersService.logout()
-    }
-
-    //頁面是否需要驗證
-    if (notCheckLogin.includes(to.name!.toString())) {
-      return
     }
 
     //檢查token是否有效

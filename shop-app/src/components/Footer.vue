@@ -3,7 +3,7 @@
 <template>
   <v-footer app absolute class="footer">
     <div class="container">
-      <p class="mb-1">網站為測試使用註冊及購買無任何意義，請勿以真實測試.</p>
+      <p class="mb-1">網站為測試使用註冊及購買無任何意義，請勿以真實資料測試.</p>
       <p class="mb-1">Copyright © 2014-2023 Evan You</p>
     </div>
   </v-footer>
