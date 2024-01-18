@@ -3,7 +3,7 @@
 
 ## 技術
 
-- **前端：** Vue 3, Vuex, Vue Router, Axios
+- **前端：** Vue 3, Vuex, Vue Router, Axios, Typescript
 - **後端：** Spring Boot, Spring Security, Spring Data JPA
 - **數據庫：**
   - PostgreSQL：用於儲存用戶和訂單相關數據
