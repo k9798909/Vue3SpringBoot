@@ -1,7 +1,10 @@
 package com.example.backend.controllers;
 
+import java.util.Optional;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,22 +12,20 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.backend.Services.UsersService;
-import com.example.backend.Validators.SignUpReqValidator;
 import com.example.backend.dto.EditUsersPostReq;
 import com.example.backend.dto.EditUsersRes;
 import com.example.backend.dto.SignUpReq;
+import com.example.backend.exception.CustomArgumentNotValidException;
 
 import jakarta.validation.Valid;
 
 @RestController
 public class UsersController {
     private UsersService usersService;
-    private SignUpReqValidator signUpReqValidator;
 
-    public UsersController(UsersService usersService, SignUpReqValidator signUpReqValidator) {
+    public UsersController(UsersService usersService) {
         super();
         this.usersService = usersService;
-        this.signUpReqValidator = signUpReqValidator;
     }
 
     @GetMapping("/public/users/checkUsername")
@@ -33,8 +34,21 @@ public class UsersController {
     }
 
     @PostMapping("/public/users/signUp")
-    public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpReq req) {
-        signUpReqValidator.validate(req);
+    public ResponseEntity<Void> signUp(@Valid @RequestBody SignUpReq req, BindingResult result) {
+        Optional.ofNullable(req.getPassword()).ifPresent(pwd -> {
+            if (!pwd.equals(req.getChkPassword())) {
+                result.rejectValue("chkPassword", "", "密碼驗證不一致");
+            }
+        });
+
+        usersService.findByUsername(req.getUsername()).ifPresent(e -> {
+            result.rejectValue("username", "", "帳號已存在");
+        });
+        
+        if (result.hasErrors()) {
+            throw new CustomArgumentNotValidException("驗證失敗", result);
+        }
+
         usersService.save(req);
         return ResponseEntity.ok().build();
     }
