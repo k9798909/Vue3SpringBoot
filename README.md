@@ -28,6 +28,14 @@
 ![image](https://github.com/k9798909/Vue3SpringBoot/assets/62507948/ace577d5-81db-4f29-8160-0b16ab144b6c)
 ![image](https://github.com/k9798909/Vue3SpringBoot/assets/62507948/8feeec23-142a-4dfb-bd99-e42e24bfa803)
 ![image](https://github.com/k9798909/Vue3SpringBoot/assets/62507948/133986dd-dfa0-4da5-8bc7-66428ac344b8)
+- ** 商品頁面
+![image](https://github.com/k9798909/Vue3SpringBoot/assets/62507948/60a4d580-8c1a-4f67-98e5-92381446a163)
+![image](https://github.com/k9798909/Vue3SpringBoot/assets/62507948/2d9083fb-9931-4d66-9981-1d0610b79932)
+- ** 結帳
+![image](https://github.com/k9798909/Vue3SpringBoot/assets/62507948/51eba16f-4bbf-4687-a304-0e6efa494f0d)
+![image](https://github.com/k9798909/Vue3SpringBoot/assets/62507948/ddc2693f-e6fb-4fa3-a96f-0d76341bb0be)
+![image](https://github.com/k9798909/Vue3SpringBoot/assets/62507948/11d9d2c5-84dd-4a51-9d58-5a5e712a7428)
+
 
 
 
