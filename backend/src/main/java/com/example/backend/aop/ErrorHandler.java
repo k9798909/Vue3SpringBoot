@@ -25,7 +25,12 @@ import com.example.backend.exception.LogicRuntimeException;
 public class ErrorHandler extends ResponseEntityExceptionHandler {
     private static final Logger logger = LoggerFactory.getLogger(ErrorHandler.class);
 
-    // 統一處理 Exception並回傳INTERNAL_SERVER_ERROR
+    /**
+     * 統一處理 Exception並回傳INTERNAL_SERVER_ERROR
+     * @param ex
+     * @param request
+     * @return
+     */
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorRes> handleConflict(Exception ex, WebRequest request) {
         logger.error("ErrorHandler catch:", ex);
@@ -33,7 +38,12 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(res);
     }
 
-    // 統一處理 CustomArgumentNotValidException 將錯誤欄位封裝回傳BAD_REQUEST
+    /**
+     * 統一處理 CustomArgumentNotValidException 將錯誤欄位封裝回傳BAD_REQUEST
+     * @param ex
+     * @param request
+     * @return
+     */
     @ExceptionHandler(CustomArgumentNotValidException.class)
     protected ResponseEntity<ErrorRes> handleCustomArgumentNotValid(CustomArgumentNotValidException ex,
             WebRequest request) {
@@ -42,15 +52,27 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(res);
     }
 
-    // 統一處理 LogicRuntimeException 將訊息回傳至前端 UNPROCESSABLE_ENTITY (422)
+    /**
+     * 統一處理 LogicRuntimeException 將訊息回傳至前端 UNPROCESSABLE_ENTITY (422)
+     * @param ex
+     * @param request
+     * @return
+     */
     @ExceptionHandler(LogicRuntimeException.class)
     protected ResponseEntity<ErrorRes> handleLogicRuntimeException(LogicRuntimeException ex, WebRequest request) {
         ErrorRes res = new ErrorRes(ErrorCode.UNPROCESSABLE_ENTITY.code(), ex.getMessage(), null);
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(res);
     }
 
-    // 統一處理 @Valid 錯誤，controller
-    // 方法不要寫BindingResult，不然MethodArgumentNotValidException會被catch
+    /**
+     * 統一處理 @Valid 錯誤，controller
+     * 方法不要寫BindingResult，不然MethodArgumentNotValidException會被catch
+     * @param ex
+     * @param headers
+     * @param status
+     * @param request
+     * @return
+     */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
             HttpHeaders headers, HttpStatusCode status, WebRequest request) {
@@ -59,7 +81,11 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, res, headers, HttpStatus.BAD_REQUEST, request);
     }
 
-    // 取得錯誤欄位及訊息
+    /**
+     * 將錯誤欄位封裝
+     * @param result
+     * @return
+     */
     private Map<String, List<String>> getFieldErrors(BindingResult result) {
         Map<String, List<String>> map = new HashMap<>();
         for (FieldError fieldError : result.getFieldErrors()) {
@@ -68,6 +94,9 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
         return map;
     }
 
+    /**
+     * 錯誤回傳格式
+     */
     private static record ErrorRes(String code, String message, Map<String, List<String>> fieldErrors) {
     }
 
