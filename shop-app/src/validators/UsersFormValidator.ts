@@ -43,7 +43,7 @@ async function checkUsername(username: string) {
       return data || '帳號已存在'
     })
     .catch((error) => {
-      console.log(`checkUsername:${checkUsername}`, error)
+      console.error(`checkUsername:${checkUsername}`, error)
       return '帳號異常'
     })
 }
