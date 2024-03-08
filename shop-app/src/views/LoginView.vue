@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import * as UsersService from '@/services/UsersService'
 import { ref, type Ref } from 'vue'
-import { ConstantKey } from '@/common/ConstantKey'
 import type { LoginForm, LoginValidationMessages } from '@/types/form/LoginForm'
 import { useRouter, type Router } from 'vue-router'
 import { getFieldErrors, isUnauthorized } from '@/http'
