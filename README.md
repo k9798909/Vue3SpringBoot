@@ -1,6 +1,6 @@
 # Vue3SpringBoot
 基於 Vue 3 和 Spring Boot 的前後端分離的電商商城專案，實現了包括登入、註冊、購物車、商品購買和訂單查詢等功能。
-
+如需開啟專案docker-compose.yml啟動可直接觀看，指令為docker compose up。
 ## 技術
 
 - **前端：** Vue 3, Vuex, Vue Router, Axios, Typescript
