@@ -1,76 +1,3 @@
-<script setup lang="ts">
-import { onMounted, ref, type Ref } from 'vue'
-import * as UsersFormValidator from '@/validators/UsersFormValidator'
-import * as UsersService from '@/services/UsersService'
-import type { EditUsersForm, EditUsersValidMessage } from '@/types/form/EditUsersForm'
-import SuccessDialog from '@/components/SuccessDialog.vue'
-import { getFieldErrors } from '@/http'
-import * as NotificationUtils from '@/utils/NotificationUtils'
-import { ViewMsg } from '@/common/MsgEnum'
-
-const dialogShow = ref(false)
-const isEdit: Ref<boolean> = ref(false)
-const toggle: Ref<boolean> = ref(false)
-const form: Ref<HTMLFormElement | null> = ref(null)
-const editForm: Ref<EditUsersForm> = ref({
-  id: '',
-  name: '',
-  birthday: new Date().toLocaleDateString('en-CA'),
-  email: '',
-  address: '',
-  username: ''
-})
-const editUsersValidMessage: Ref<EditUsersValidMessage> = ref({
-  name: [],
-  birthday: [],
-  email: [],
-  address: []
-})
-
-async function submit(e: MouseEvent) {
-  try {
-    e.preventDefault()
-
-    const valid = (await form.value!.validate()).valid
-    if (!valid) {
-      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
-      return
-    }
-
-    await UsersService.updateForEditPage(editForm.value)
-    isEdit.value = false
-    dialogShow.value = true
-  } catch (error) {
-    const fieldErrors = getFieldErrors<EditUsersValidMessage>(error)
-    if (fieldErrors) {
-      editUsersValidMessage.value = fieldErrors
-      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
-      return
-    }
-
-    console.error('server error', error)
-    NotificationUtils.showErrorNotification(ViewMsg.ServerError)
-  }
-}
-
-async function initEditForm(): Promise<void> {
-  try {
-    const data = await UsersService.findEditUsers()
-    editForm.value.id = data.id
-    editForm.value.birthday = data.birthday
-    editForm.value.email = data.email
-    editForm.value.address = data.address
-    editForm.value.username = data.username
-    editForm.value.name = data.name
-  } catch (error) {
-    console.error('server error', error)
-    NotificationUtils.showErrorNotification(ViewMsg.ServerError)
-  }
-}
-
-onMounted(initEditForm)
-</script>
-
 <template>
   <main>
     <v-form class="form" ref="form">
@@ -162,6 +89,80 @@ onMounted(initEditForm)
     <!--  ]] -->
   </main>
 </template>
+
+<script setup lang="ts">
+import { onMounted, ref, type Ref } from 'vue'
+import * as UsersFormValidator from '@/validators/UsersFormValidator'
+import * as UsersService from '@/services/UsersService'
+import type { EditUsersForm, EditUsersValidMessage } from '@/types/form/EditUsersForm'
+import SuccessDialog from '@/components/SuccessDialog.vue'
+import { getFieldErrors } from '@/http'
+import * as NotificationUtils from '@/utils/NotificationUtils'
+import { ViewMsg } from '@/common/MsgEnum'
+
+const dialogShow = ref(false)
+const isEdit: Ref<boolean> = ref(false)
+const toggle: Ref<boolean> = ref(false)
+const form: Ref<HTMLFormElement | null> = ref(null)
+const editForm: Ref<EditUsersForm> = ref({
+  id: '',
+  name: '',
+  birthday: new Date().toLocaleDateString('en-CA'),
+  email: '',
+  address: '',
+  username: ''
+})
+const editUsersValidMessage: Ref<EditUsersValidMessage> = ref({
+  name: [],
+  birthday: [],
+  email: [],
+  address: []
+})
+
+async function submit(e: MouseEvent) {
+  try {
+    e.preventDefault()
+
+    const valid = (await form.value!.validate()).valid
+    if (!valid) {
+      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
+      return
+    }
+
+    await UsersService.updateForEditPage(editForm.value)
+    isEdit.value = false
+    dialogShow.value = true
+  } catch (error) {
+    const fieldErrors = getFieldErrors<EditUsersValidMessage>(error)
+    if (fieldErrors) {
+      editUsersValidMessage.value = fieldErrors
+      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
+      return
+    }
+
+    console.error('server error', error)
+    NotificationUtils.showErrorNotification(ViewMsg.ServerError)
+  }
+}
+
+async function initEditForm(): Promise<void> {
+  try {
+    const data = await UsersService.findEditUsers()
+    editForm.value.id = data.id
+    editForm.value.birthday = data.birthday
+    editForm.value.email = data.email
+    editForm.value.address = data.address
+    editForm.value.username = data.username
+    editForm.value.name = data.name
+  } catch (error) {
+    console.error('server error', error)
+    NotificationUtils.showErrorNotification(ViewMsg.ServerError)
+  }
+}
+
+onMounted(initEditForm)
+</script>
+
 <style lang="scss" scoped>
 :deep(.v-field__input:read-only) {
   color: gray;

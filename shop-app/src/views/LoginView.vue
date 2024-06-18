@@ -1,3 +1,60 @@
+<template>
+  <v-form ref="form">
+    <div>
+      <v-img
+        class="mx-auto my-6"
+        max-width="228"
+        src="https://cdn.vuetifyjs.com/docs/images/logos/vuetify-logo-v3-slim-text-light.svg"
+      ></v-img>
+      <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
+        <div class="text-subtitle-1 text-medium-emphasis">使用者名稱</div>
+
+        <v-text-field
+          density="compact"
+          placeholder="輸入使用者名稱"
+          prepend-inner-icon="mdi-email-outline"
+          variant="outlined"
+          v-model="loginForm.username"
+          :rules="[() => loginForm.username.length > 0 || '請輸入使用者名稱']"
+          :error-messages="loginValidMessage.username"
+        ></v-text-field>
+
+        <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
+          密碼
+
+          <!-- <a
+          class="text-caption text-decoration-none text-blue"
+          href="#"
+          rel="noopener noreferrer"
+          target="_blank"
+        >
+          Forgot login password?</a
+        > -->
+        </div>
+
+        <v-text-field
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+          :type="visible ? 'text' : 'password'"
+          density="compact"
+          placeholder="輸入密碼"
+          prepend-inner-icon="mdi-lock-outline"
+          variant="outlined"
+          v-model="loginForm.password"
+          @click:append-inner="visible = !visible"
+          :rules="[() => loginForm.password.length > 0 || '請輸入密碼']"
+          :error-messages="loginValidMessage.password"
+        ></v-text-field>
+        <v-alert class="mb-5" v-if="msg" density="compact" type="error" variant="tonal">{{
+          msg
+        }}</v-alert>
+        <v-btn block class="mb-5" color="indigo" size="large" variant="elevated" @click="loginEvent"
+          >登入</v-btn
+        >
+      </v-card>
+    </div>
+  </v-form>
+</template>
+
 <script setup lang="ts">
 import * as UsersService from '@/services/UsersService'
 import { ref, type Ref } from 'vue'
@@ -57,60 +114,4 @@ const loginEvent = async () => {
 }
 </script>
 
-<template>
-  <v-form ref="form">
-    <div>
-      <v-img
-        class="mx-auto my-6"
-        max-width="228"
-        src="https://cdn.vuetifyjs.com/docs/images/logos/vuetify-logo-v3-slim-text-light.svg"
-      ></v-img>
-      <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
-        <div class="text-subtitle-1 text-medium-emphasis">使用者名稱</div>
-
-        <v-text-field
-          density="compact"
-          placeholder="輸入使用者名稱"
-          prepend-inner-icon="mdi-email-outline"
-          variant="outlined"
-          v-model="loginForm.username"
-          :rules="[() => loginForm.username.length > 0 || '請輸入使用者名稱']"
-          :error-messages="loginValidMessage.username"
-        ></v-text-field>
-
-        <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-          密碼
-
-          <!-- <a
-          class="text-caption text-decoration-none text-blue"
-          href="#"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          Forgot login password?</a
-        > -->
-        </div>
-
-        <v-text-field
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-          :type="visible ? 'text' : 'password'"
-          density="compact"
-          placeholder="輸入密碼"
-          prepend-inner-icon="mdi-lock-outline"
-          variant="outlined"
-          v-model="loginForm.password"
-          @click:append-inner="visible = !visible"
-          :rules="[() => loginForm.password.length > 0 || '請輸入密碼']"
-          :error-messages="loginValidMessage.password"
-        ></v-text-field>
-        <v-alert class="mb-5" v-if="msg" density="compact" type="error" variant="tonal">{{
-          msg
-        }}</v-alert>
-        <v-btn block class="mb-5" color="indigo" size="large" variant="elevated" @click="loginEvent"
-          >登入</v-btn
-        >
-      </v-card>
-    </div>
-  </v-form>
-</template>
 <style lang="scss" scoped></style>

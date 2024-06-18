@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
   <v-footer app absolute class="footer">
     <div class="container">
@@ -8,6 +6,8 @@
     </div>
   </v-footer>
 </template>
+
+<script setup lang="ts"></script>
 
 <style lang="scss" scoped>
 $font-color: #213547;

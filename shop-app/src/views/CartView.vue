@@ -1,67 +1,3 @@
-<script setup lang="ts">
-import * as CartService from '@/services/CartService'
-import { onMounted, ref, type Ref } from 'vue'
-import type CartProduct from '@/types/dto/CartProductDto'
-import * as OrdersService from '@/services/OrdersService'
-import { useRouter, type Router } from 'vue-router'
-import * as NotificationUtils from '@/utils/NotificationUtils'
-import { handleUnauthorized } from '@/http'
-import { ViewMsg } from '@/common/MsgEnum'
-
-const cart: Ref<CartProduct[]> = ref([])
-const message = ref('讀取中...')
-const router: Router = useRouter()
-
-async function initProducts() {
-  CartService.getCartProductList()
-    .then((cartList) => {
-      cart.value.push(...cartList)
-      if (cart.value.length == 0) {
-        message.value = '購物車無商品'
-      }
-    })
-    .catch((error) => {
-      if (handleUnauthorized(error)) {
-        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
-        return
-      }
-      console.error('cartService getCartList error:', error)
-    })
-}
-
-async function deleteCartProduct(e: MouseEvent, productId: string) {
-  CartService.deleteCartProduct(productId)
-    .then((res) => {
-      cart.value = res
-      if (cart.value.length == 0) {
-        message.value = '購物車無商品'
-      }
-    })
-    .catch((error) => {
-      if (handleUnauthorized(error)) {
-        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
-        return
-      }
-      console.error('cartService deleteCartProduct error:', e)
-      NotificationUtils.showErrorNotification(ViewMsg.ServerError)
-    })
-}
-
-async function checkout() {
-  OrdersService.checkout()
-    .then((res) => {
-      NotificationUtils.showSuccessNotification('結帳成功')
-      router.push('/orders')
-    })
-    .catch((e) => {
-      NotificationUtils.showErrorNotification('結帳失敗')
-      console.error(e)
-    })
-}
-
-onMounted(initProducts)
-</script>
-
 <template>
   <div>
     <v-card border class="mx-auto my-5" width="60%" min-width="400px" min-height="200px">
@@ -125,5 +61,69 @@ onMounted(initProducts)
     </v-card>
   </div>
 </template>
+
+<script setup lang="ts">
+import * as CartService from '@/services/CartService'
+import { onMounted, ref, type Ref } from 'vue'
+import type CartProduct from '@/types/dto/CartProductDto'
+import * as OrdersService from '@/services/OrdersService'
+import { useRouter, type Router } from 'vue-router'
+import * as NotificationUtils from '@/utils/NotificationUtils'
+import { handleUnauthorized } from '@/http'
+import { ViewMsg } from '@/common/MsgEnum'
+
+const cart: Ref<CartProduct[]> = ref([])
+const message = ref('讀取中...')
+const router: Router = useRouter()
+
+async function initProducts() {
+  CartService.getCartProductList()
+    .then((cartList) => {
+      cart.value.push(...cartList)
+      if (cart.value.length == 0) {
+        message.value = '購物車無商品'
+      }
+    })
+    .catch((error) => {
+      if (handleUnauthorized(error)) {
+        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
+        return
+      }
+      console.error('cartService getCartList error:', error)
+    })
+}
+
+async function deleteCartProduct(e: MouseEvent, productId: string) {
+  CartService.deleteCartProduct(productId)
+    .then((res) => {
+      cart.value = res
+      if (cart.value.length == 0) {
+        message.value = '購物車無商品'
+      }
+    })
+    .catch((error) => {
+      if (handleUnauthorized(error)) {
+        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
+        return
+      }
+      console.error('cartService deleteCartProduct error:', e)
+      NotificationUtils.showErrorNotification(ViewMsg.ServerError)
+    })
+}
+
+async function checkout() {
+  OrdersService.checkout()
+    .then((res) => {
+      NotificationUtils.showSuccessNotification('結帳成功')
+      router.push('/orders')
+    })
+    .catch((e) => {
+      NotificationUtils.showErrorNotification('結帳失敗')
+      console.error(e)
+    })
+}
+
+onMounted(initProducts)
+</script>
 
 <style lang="scss" scoped></style>

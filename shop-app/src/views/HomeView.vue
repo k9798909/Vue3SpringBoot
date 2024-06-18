@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
   <main>
     <div>
@@ -39,6 +37,8 @@
     </div>
   </main>
 </template>
+
+<script setup lang="ts"></script>
 
 <style lang="scss" scoped>
 .banner {

@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import Header from '@/components/Header.vue'
-import Footer from '@/components/Footer.vue'
-import Overlay from '@/components/Overlay.vue'
-</script>
-
 <template>
   <v-layout class="rounded rounded-md">
     <Header></Header>
@@ -15,6 +9,12 @@ import Overlay from '@/components/Overlay.vue'
     <Overlay></Overlay>
   </v-layout>
 </template>
+
+<script setup lang="ts">
+import Header from '@/components/Header.vue'
+import Footer from '@/components/Footer.vue'
+import Overlay from '@/components/Overlay.vue'
+</script>
 
 <style lang="scss" scoped>
 .main {
