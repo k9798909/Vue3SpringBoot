@@ -1,3 +1,35 @@
+<script setup lang="ts">
+import { onMounted, ref, watch, type Ref } from 'vue'
+import * as UsersService from '@/services/UsersService'
+import headerItems from '@/common/HeaderItems'
+import type Users from '@/types/stores/Users'
+import router from '@/router'
+import useUsersStore from '@/stores/UseUsersStore'
+
+const userStore = useUsersStore()
+let isLogin: Ref<boolean> = ref(false)
+let name: Ref<string> = ref('')
+
+async function loadUserStatus(): Promise<void> {
+  let users: Users | null = UsersService.getStoreUsers()
+  name.value = users?.name || ''
+  isLogin.value = !!users
+}
+
+function logoutEvent(): void {
+  UsersService.logout()
+  router.push('/login')
+}
+
+onMounted(loadUserStatus)
+
+//監聽store有更動觸發init
+watch(
+  () => userStore.users,
+  () => loadUserStatus()
+)
+</script>
+
 <template>
   <v-app-bar :elevation="1">
     <v-toolbar-title>
@@ -43,38 +75,6 @@
     </v-menu>
   </v-app-bar>
 </template>
-
-<script setup lang="ts">
-import { onMounted, ref, watch, type Ref } from 'vue'
-import * as UsersService from '@/services/UsersService'
-import headerItems from '@/common/HeaderItems'
-import type Users from '@/types/stores/Users'
-import router from '@/router'
-import useUsersStore from '@/stores/UseUsersStore'
-
-const userStore = useUsersStore()
-let isLogin: Ref<boolean> = ref(false)
-let name: Ref<string> = ref('')
-
-async function loadUserStatus(): Promise<void> {
-  let users: Users | null = UsersService.getStoreUsers()
-  name.value = users?.name || ''
-  isLogin.value = !!users
-}
-
-function logoutEvent(): void {
-  UsersService.logout()
-  router.push('/login')
-}
-
-onMounted(loadUserStatus)
-
-//監聽store有更動觸發init
-watch(
-  () => userStore.users,
-  () => loadUserStatus()
-)
-</script>
 
 <style lang="scss" scoped>
 .logo {

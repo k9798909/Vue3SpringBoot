@@ -1,3 +1,34 @@
+<script setup lang="ts">
+import getApiClient from '@/http'
+import type { OrderDetailDto, OrdersDto } from '@/types/dto/OrdersDto'
+import { onMounted, ref, type Ref } from 'vue'
+import OrderDetails from '@/components/OrderDetails.vue'
+
+const orders: Ref<OrdersDto[]> = ref([])
+const dialogShow: Ref<boolean> = ref(false)
+const orderDetails: Ref<OrderDetailDto[]> = ref([])
+
+const initOrders = async () => {
+  getApiClient()
+    .get('/orders')
+    .then((res) => {
+      orders.value.push(...res.data)
+    })
+    .catch((e) => console.error(e))
+}
+
+const dtlEvent = (order: OrdersDto) => {
+  dialogShow.value = true
+  orderDetails.value = order.orderDetails
+}
+
+const dialogFalse = () => {
+  dialogShow.value = false
+}
+
+onMounted(initOrders)
+</script>
+
 <template>
   <div>
     <v-container>
@@ -31,36 +62,4 @@
     <!--  ]] -->
   </div>
 </template>
-
-<script setup lang="ts">
-import getApiClient from '@/http'
-import type { OrderDetailDto, OrdersDto } from '@/types/dto/OrdersDto'
-import { onMounted, ref, type Ref } from 'vue'
-import OrderDetails from '@/components/OrderDetails.vue'
-
-const orders: Ref<OrdersDto[]> = ref([])
-const dialogShow: Ref<boolean> = ref(false)
-const orderDetails: Ref<OrderDetailDto[]> = ref([])
-
-const initOrders = async () => {
-  getApiClient()
-    .get('/orders')
-    .then((res) => {
-      orders.value.push(...res.data)
-    })
-    .catch((e) => console.error(e))
-}
-
-const dtlEvent = (order: OrdersDto) => {
-  dialogShow.value = true
-  orderDetails.value = order.orderDetails
-}
-
-const dialogFalse = () => {
-  dialogShow.value = false
-}
-
-onMounted(initOrders)
-</script>
-
 <style lang="scss" scoped></style>

@@ -1,3 +1,62 @@
+<script setup lang="ts">
+import { ref, type Ref } from 'vue'
+import * as UsersService from '@/services/UsersService'
+import * as UsersFormValidator from '@/validators/UsersFormValidator'
+import type { SignUpForm, SignUpValidMessage } from '@/types/form/SignUpForm'
+import { useRouter, type Router } from 'vue-router'
+import SuccessDialog from '@/components/SuccessDialog.vue'
+import { getFieldErrors } from '@/http'
+import * as NotificationUtils from '@/utils/NotificationUtils'
+import { ViewMsg } from '@/common/MsgEnum'
+
+const router: Router = useRouter()
+let dialogShow: Ref<boolean> = ref(false)
+const form: Ref<HTMLFormElement | null> = ref(null)
+const formParams: Ref<SignUpForm> = ref({
+  name: '',
+  birthday: new Date().toLocaleDateString('en-CA'),
+  email: '',
+  address: '',
+  username: '',
+  password: '',
+  chkPassword: ''
+})
+const validMessage: Ref<SignUpValidMessage> = ref({
+  name: [],
+  birthday: [],
+  email: [],
+  address: [],
+  username: [],
+  password: [],
+  chkPassword: []
+})
+
+async function submit(e: MouseEvent) {
+  try {
+    e.preventDefault()
+
+    const valid = (await form.value!.validate()).valid
+    if (!valid) {
+      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
+      return
+    }
+
+    await UsersService.signUp(formParams.value)
+    dialogShow.value = true
+  } catch (error) {
+    const fieldErrors = getFieldErrors<SignUpValidMessage>(error)
+    if (fieldErrors) {
+      validMessage.value = fieldErrors
+      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
+      return
+    }
+
+    console.error('server error', error)
+    NotificationUtils.showErrorNotification(ViewMsg.ServerError)
+  }
+}
+</script>
+
 <template>
   <main>
     <v-form ref="form">
@@ -103,64 +162,4 @@
     <!--  ]] -->
   </main>
 </template>
-
-<script setup lang="ts">
-import { ref, type Ref } from 'vue'
-import * as UsersService from '@/services/UsersService'
-import * as UsersFormValidator from '@/validators/UsersFormValidator'
-import type { SignUpForm, SignUpValidMessage } from '@/types/form/SignUpForm'
-import { useRouter, type Router } from 'vue-router'
-import SuccessDialog from '@/components/SuccessDialog.vue'
-import { getFieldErrors } from '@/http'
-import * as NotificationUtils from '@/utils/NotificationUtils'
-import { ViewMsg } from '@/common/MsgEnum'
-
-const router: Router = useRouter()
-let dialogShow: Ref<boolean> = ref(false)
-const form: Ref<HTMLFormElement | null> = ref(null)
-const formParams: Ref<SignUpForm> = ref({
-  name: '',
-  birthday: new Date().toLocaleDateString('en-CA'),
-  email: '',
-  address: '',
-  username: '',
-  password: '',
-  chkPassword: ''
-})
-const validMessage: Ref<SignUpValidMessage> = ref({
-  name: [],
-  birthday: [],
-  email: [],
-  address: [],
-  username: [],
-  password: [],
-  chkPassword: []
-})
-
-async function submit(e: MouseEvent) {
-  try {
-    e.preventDefault()
-
-    const valid = (await form.value!.validate()).valid
-    if (!valid) {
-      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
-      return
-    }
-
-    await UsersService.signUp(formParams.value)
-    dialogShow.value = true
-  } catch (error) {
-    const fieldErrors = getFieldErrors<SignUpValidMessage>(error)
-    if (fieldErrors) {
-      validMessage.value = fieldErrors
-      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
-      return
-    }
-
-    console.error('server error', error)
-    NotificationUtils.showErrorNotification(ViewMsg.ServerError)
-  }
-}
-</script>
-
 <style lang="scss" scoped></style>

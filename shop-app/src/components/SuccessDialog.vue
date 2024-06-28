@@ -1,3 +1,15 @@
+<script setup lang="ts">
+export interface Prop {
+  dialogShow: boolean
+  title: string
+  content: string
+  btnName: string
+  btnFunction: () => void
+}
+
+const props = defineProps<Prop>()
+</script>
+
 <template>
   <!--  成功視窗 [[ -->
   <v-dialog v-model="props.dialogShow" width="50%">
@@ -30,17 +42,5 @@
   </v-dialog>
   <!--  ]] -->
 </template>
-
-<script setup lang="ts">
-export interface Prop {
-  dialogShow: boolean
-  title: string
-  content: string
-  btnName: string
-  btnFunction: () => void
-}
-
-const props = defineProps<Prop>()
-</script>
 
 <style lang="scss" scoped></style>

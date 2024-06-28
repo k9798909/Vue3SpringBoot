@@ -1,3 +1,37 @@
+<script setup lang="ts">
+import Product from '../components/Product.vue'
+import { onMounted, ref, type Ref } from 'vue'
+import * as ProductService from '@/services/ProductService'
+import type ProductDto from '@/types/dto/ProductDto'
+
+const searchInput: Ref<string> = ref('')
+const products: Ref<ProductDto[]> = ref([])
+
+async function initProductList(): Promise<void> {
+  ProductService.findAll()
+    .then((data) => {
+      products.value = data
+    })
+    .catch((e) => {
+      console.error('ProductService findByName', e)
+    })
+}
+
+async function searchEvent(e: MouseEvent): Promise<void> {
+  try {
+    if (!searchInput.value) {
+      products.value = await ProductService.findAll()
+    }
+
+    products.value = await ProductService.findByName(searchInput.value)
+  } catch (error) {
+    console.error('ProductService searchEvent', e)
+  }
+}
+
+onMounted(initProductList)
+</script>
+
 <template>
   <main>
     <div class="mx-auto w-50 d-flex">
@@ -39,39 +73,4 @@
     </v-container>
   </main>
 </template>
-
-<script setup lang="ts">
-import Product from '../components/Product.vue'
-import { onMounted, ref, type Ref } from 'vue'
-import * as ProductService from '@/services/ProductService'
-import type ProductDto from '@/types/dto/ProductDto'
-
-const searchInput: Ref<string> = ref('')
-const products: Ref<ProductDto[]> = ref([])
-
-async function initProductList(): Promise<void> {
-  ProductService.findAll()
-    .then((data) => {
-      products.value = data
-    })
-    .catch((e) => {
-      console.error('ProductService findByName', e)
-    })
-}
-
-async function searchEvent(e: MouseEvent): Promise<void> {
-  try {
-    if (!searchInput.value) {
-      products.value = await ProductService.findAll()
-    }
-
-    products.value = await ProductService.findByName(searchInput.value)
-  } catch (error) {
-    console.error('ProductService searchEvent', e)
-  }
-}
-
-onMounted(initProductList)
-</script>
-
 <style lang="scss" scoped></style>

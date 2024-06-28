@@ -1,3 +1,11 @@
+<script setup lang="ts">
+import type { OrderDetailDto } from '@/types/dto/OrdersDto'
+
+const props = defineProps<{
+  orderDetails: OrderDetailDto[]
+}>()
+</script>
+
 <template>
   <v-container class="bg-white" style="border-radius: 10px">
     <v-col>
@@ -26,13 +34,5 @@
     <v-btn variant="plain" @click="$emit('dialogFalse')" block>返回</v-btn>
   </v-container>
 </template>
-
-<script setup lang="ts">
-import type { OrderDetailDto } from '@/types/dto/OrdersDto'
-
-const props = defineProps<{
-  orderDetails: OrderDetailDto[]
-}>()
-</script>
 
 <style lang="scss" scoped></style>
