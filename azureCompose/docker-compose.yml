@@ -13,8 +13,8 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
   backend-service:
-    container_name: backend-service
-    image: k9798909/backend-service
+    container_name: shop-app-backend
+    image: k9798909/shop-app-backend
     depends_on:
       - postgres
       - redis
@@ -24,4 +24,4 @@ services:
     ports:
       - 8080:8080
     depends_on:
-      - backend-service
+      - shop-app-backend
