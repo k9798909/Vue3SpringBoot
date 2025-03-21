@@ -4,6 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.example.shopappbackend.model.ProductImage;
 
-public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
+import java.util.Optional;
 
+public interface ProductImageRepository extends JpaRepository<ProductImage, Long> {
+    Optional<ProductImage> findByProductId(String productId);
 }

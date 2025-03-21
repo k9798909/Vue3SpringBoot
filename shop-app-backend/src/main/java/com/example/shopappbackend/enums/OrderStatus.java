@@ -1,22 +1,17 @@
 package com.example.shopappbackend.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum OrderStatus {
     PENDING("0", "待出貨"), SHIPPED("1", "已出貨");
 
-    private String code;
-    private String name;
+    private final String code;
+    private final String name;
 
     OrderStatus(String code, String name) {
         this.code = code;
         this.name = name;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public static OrderStatus fromCode(String code) {

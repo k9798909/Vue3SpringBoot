@@ -2,6 +2,8 @@ package com.example.shopappbackend.controllers;
 
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.BindingResult;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.shopappbackend.Services.UsersService;
+import com.example.shopappbackend.services.UsersService;
 import com.example.shopappbackend.dto.EditUsersPostReq;
 import com.example.shopappbackend.dto.EditUsersRes;
 import com.example.shopappbackend.dto.SignUpReq;
@@ -20,13 +22,9 @@ import com.example.shopappbackend.exception.CustomArgumentNotValidException;
 import jakarta.validation.Valid;
 
 @RestController
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UsersController {
-    private UsersService usersService;
-
-    public UsersController(UsersService usersService) {
-        super();
-        this.usersService = usersService;
-    }
+    private final UsersService usersService;
 
     @GetMapping("/public/users/checkUsername")
     public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {

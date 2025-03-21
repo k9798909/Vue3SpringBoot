@@ -1,5 +1,7 @@
 package com.example.shopappbackend.config;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -21,12 +23,9 @@ import com.example.shopappbackend.utils.JwtTokenUtils;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class SecurityConfiguration {
-    private JwtTokenUtils jwtTokenUtils;
-
-    public SecurityConfiguration(JwtTokenUtils jwtTokenUtils) {
-        this.jwtTokenUtils = jwtTokenUtils;
-    }
+    private final JwtTokenUtils jwtTokenUtils;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtTokenFilter jwtTokenFilter) throws Exception {
@@ -46,7 +45,7 @@ public class SecurityConfiguration {
 
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder,
-            UserDetailsService userDetailsService)
+                                                       UserDetailsService userDetailsService)
             throws Exception {
         AuthenticationManagerBuilder authenticationManagerBuilder = http
                 .getSharedObject(AuthenticationManagerBuilder.class);

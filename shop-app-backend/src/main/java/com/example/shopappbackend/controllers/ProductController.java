@@ -2,6 +2,8 @@ package com.example.shopappbackend.controllers;
 
 import java.util.List;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -10,16 +12,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.shopappbackend.Services.ProductService;
+import com.example.shopappbackend.services.ProductService;
 import com.example.shopappbackend.dto.ProductDto;
 
 @RestController
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class ProductController {
-    private ProductService productService;
-
-    public ProductController(ProductService productService) {
-        this.productService = productService;
-    }
+    private final ProductService productService;
 
     @GetMapping("/public/product")
     public ResponseEntity<List<ProductDto>> getAll() {

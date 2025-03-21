@@ -1,4 +1,4 @@
-package com.example.shopappbackend.Services;
+package com.example.shopappbackend.services;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -28,30 +30,20 @@ import com.example.shopappbackend.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class OrdersService {
-    private OrdersRepository orderRepository;
-    private ProductRepository productRepository;
-    private RedisTemplate<String, List<Cart>> redisTemplate;
-    private UsersService usersService;
-
-    public OrdersService(OrdersRepository orderRepository, ProductRepository productRepository,
-            RedisTemplate<String, List<Cart>> redisTemplate, UsersService usersService) {
-        this.orderRepository = orderRepository;
-        this.productRepository = productRepository;
-        this.redisTemplate = redisTemplate;
-        this.usersService = usersService;
-    }
+    private final OrdersRepository orderRepository;
+    private final ProductRepository productRepository;
+    private final RedisTemplate<String, List<Cart>> redisTemplate;
+    private final UsersService usersService;
 
     public List<OrderDto> findByUsername(String username) {
         Users users = usersService.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("找不到登入者訂單資訊"));
 
-        Example<Orders> ex = Example.of(new Orders());
-        ex.getProbe().setUserId(users.getId());
-        List<Orders> orders = orderRepository.findAll(ex);
+        List<Orders> orders = orderRepository.findByUserId(users.getId());
 
         List<OrderDto> orderDtos = orders.stream().map(t -> {
-            String orderDate = t.getOrderDate().format(DateTimeFormatter.ISO_DATE).toString();
             String status = OrderStatus.toName(t.getStatus());
 
             List<OrderDetailsDto> dts = t.getOrderDetails().stream().map(dt -> {
@@ -74,7 +66,7 @@ public class OrdersService {
 
             OrderDto dto = new OrderDto();
             dto.setOrderId(t.getOrderId());
-            dto.setOrderDate(orderDate);
+            dto.setOrderDate(t.getOrderDate());
             dto.setTotalPrice(t.getTotalPrice());
             dto.setStatus(status);
             dto.setOrderDetails(dts);

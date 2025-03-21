@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -17,6 +19,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class JwtTokenFilter extends OncePerRequestFilter {
     private JwtTokenUtils jwtTokenUtils;
 
@@ -29,7 +32,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         // Get jwt token and validate
         final Optional<String> token = getValidJwtTokenFromHeader(request);
-        if (!token.isPresent()) {
+        if (token.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -50,9 +53,8 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
     /**
      * 從header取得token，token過期或不合法回傳empty
-     * 
-     * @param request
-     * @return
+     *
+     * @param request HttpServletRequest
      */
     private Optional<String> getValidJwtTokenFromHeader(HttpServletRequest request) {
         final String header = request.getHeader(HttpHeaders.AUTHORIZATION);

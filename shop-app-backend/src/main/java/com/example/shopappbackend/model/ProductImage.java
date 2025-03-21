@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class ProductImage implements Serializable {
     /**
-     * 
+     *
      */
     private static final long serialVersionUID = 1L;
     @Id

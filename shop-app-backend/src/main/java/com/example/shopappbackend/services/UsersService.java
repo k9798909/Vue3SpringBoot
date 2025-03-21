@@ -1,9 +1,11 @@
-package com.example.shopappbackend.Services;
+package com.example.shopappbackend.services;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,16 +22,11 @@ import com.example.shopappbackend.utils.JwtTokenUtils;
 import jakarta.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class UsersService implements UserDetailsService {
-    private UsersRepository usersRepository;
-    private JwtTokenUtils jwtTokenUtils;
-    private PasswordEncoder passwordEncoder;
-
-    public UsersService(UsersRepository usersRepository, JwtTokenUtils jwtTokenUtils, PasswordEncoder passwordEncoder) {
-        this.usersRepository = usersRepository;
-        this.jwtTokenUtils = jwtTokenUtils;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final UsersRepository usersRepository;
+    private final JwtTokenUtils jwtTokenUtils;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
