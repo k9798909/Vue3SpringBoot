@@ -1,9 +1,9 @@
 import axios, { AxiosError, type AxiosInstance } from 'axios'
 import { ContentTypeEnum, NetworkErrorCode } from '../common/HttpEnum'
-import * as UsersService from '@/services/UsersService'
 import type ResponseError from '@/types/http/ResponseError'
 import useStore from '@/stores/UseStore'
 import router from '@/router'
+import useUsersStore from '@/stores/UseUsersStore.ts'
 
 // 建立一個axios實體，並設定預設的baseURL、header、interceptors。
 const getApiClient = (options = {}): AxiosInstance => {
@@ -18,11 +18,12 @@ const getApiClient = (options = {}): AxiosInstance => {
 
 //建立axios實體
 function createInstance(options = {}): AxiosInstance {
+  const usersStore = useUsersStore()
   return axios.create({
     baseURL: '/api',
     headers: {
       'Content-type': ContentTypeEnum.JSON,
-      Authorization: 'Bearer ' + UsersService.getStoreUsers()?.token || '',
+      Authorization: 'Bearer ' + usersStore.users?.token || '',
       ...options
     }
   })
@@ -94,7 +95,8 @@ export function handleUnauthorized(error: any) {
 
 //是否為未授權或輸入的帳號密碼錯誤。
 export function isUnauthorized(error: any): boolean {
-  let axiosError: AxiosError = error as AxiosError
+  const axiosError: AxiosError = error as AxiosError
+  console.log(axiosError.response?.status)
   return NetworkErrorCode.Unauthorized == axiosError.response?.status
 }
 

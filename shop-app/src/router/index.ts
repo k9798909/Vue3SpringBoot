@@ -4,6 +4,7 @@ import * as UsersService from '@/services/UsersService'
 import * as NotificationUtils from '@/utils/NotificationUtils'
 import useStore from '@/stores/UseStore'
 import { ViewMsg } from '@/common/MsgEnum'
+import useUsersStore from '@/stores/UseUsersStore.ts'
 
 const productViewName = 'product'
 const loginViewName = 'login'
@@ -75,7 +76,7 @@ async function loginCheck(to: RouteLocationNormalized, from: RouteLocationNormal
       return
     }
 
-    const token = UsersService.getStoreUsers()?.token || ''
+    const token = useUsersStore().users?.token
     const isVerify = await UsersService.verifyToken(token)
 
     //確定token是否過期如果過期將token刪除

@@ -1,48 +1,79 @@
+<template>
+  <v-card class="mx-auto px-5 pb-5 mt-15" elevation="8" max-width="448" rounded="lg">
+    <v-card-text>
+      <p class="text-h5 font-weight-black mb-5 text-center">登入</p>
+      <v-form>
+        <TextField
+          v-model="loginForm.username"
+          label="使用者名稱"
+          placeholder="輸入使用者名稱"
+          prepend-inner-icon="mdi-email-outline"
+          variant="outlined"
+          color="primary"
+          required
+          :custonErrorMessage="errorMessage?.username"
+          class="mb-2"
+        ></TextField>
+        <TextField
+          v-model="loginForm.password"
+          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
+          :type="visible ? 'text' : 'password'"
+          placeholder="輸入密碼"
+          prepend-inner-icon="mdi-lock-outline"
+          required
+          variant="outlined"
+          label="密碼"
+          color="primary"
+          @click:append-inner="visible = !visible"
+          :custonErrorMessage="errorMessage?.password"
+          class="mb-2"
+        >
+        </TextField>
+        <v-alert v-if="msg" class="mb-5" density="compact" type="error" variant="tonal"
+          >{{ msg }}
+        </v-alert>
+        <v-btn block color="indigo" size="large" variant="elevated" @click="onLogin">登入</v-btn>
+      </v-form>
+    </v-card-text>
+  </v-card>
+</template>
 <script setup lang="ts">
-import * as UsersService from '@/services/UsersService'
-import { ref, type Ref } from 'vue'
-import type { LoginForm, LoginValidationMessages } from '@/types/form/LoginForm'
-import { useRouter, type Router } from 'vue-router'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { getFieldErrors, isUnauthorized } from '@/http'
 import * as NotificationUtils from '@/utils/NotificationUtils'
 import useStore from '@/stores/UseStore'
 import { ViewMsg } from '@/common/MsgEnum'
+import useUsersStore from '@/stores/UseUsersStore.ts'
+import TextField from '@/components/TextField.vue'
+import type { FieldError } from '@/composables/UseAxios.ts'
 
-const router: Router = useRouter()
-//密碼能見度
-const visible: Ref<boolean> = ref(false)
-//session訊息用完移除
-const msg: Ref<string> = ref('')
-const form: Ref<HTMLFormElement | null> = ref(null)
+export interface LoginForm {
+  username: string
+  password: string
+}
 
-const loginForm: Ref<LoginForm> = ref({
-  username: '',
-  password: ''
-})
+const usersStore = useUsersStore()
+const router = useRouter()
+const visible = ref(false)
+const msg = ref('')
+const loginForm = ref<Partial<LoginForm>>({})
+const errorMessage = ref<FieldError>()
 
-const loginValidMessage: Ref<LoginValidationMessages> = ref({
-  username: [],
-  password: []
-})
-
-const loginEvent = async () => {
+const onLogin = async () => {
   msg.value = ''
-
-  const valid = (await form.value!.validate()).valid
-  if (!valid) {
-    return
-  }
-
-  UsersService.login(loginForm.value)
+  errorMessage.value = undefined
+  await usersStore
+    .login(loginForm.value)
     .then(() => {
       const toUrl = useStore().getBeforeLoginUrl
       useStore().clearBeforeLoginUrl()
       router.push(toUrl || '/index')
     })
     .catch((error) => {
-      const fieldErrors = getFieldErrors<LoginValidationMessages>(error)
+      const fieldErrors = getFieldErrors<FieldError>(error)
       if (fieldErrors) {
-        loginValidMessage.value = fieldErrors
+        errorMessage.value = fieldErrors
         return
       }
 
@@ -50,67 +81,8 @@ const loginEvent = async () => {
         msg.value = '帳號或密碼錯誤'
         return
       }
-
       console.error('server error', error)
       NotificationUtils.showErrorNotification(ViewMsg.ServerError)
     })
 }
 </script>
-
-<template>
-  <v-form ref="form">
-    <div>
-      <v-img
-        class="mx-auto my-6"
-        max-width="228"
-        src="https://cdn.vuetifyjs.com/docs/images/logos/vuetify-logo-v3-slim-text-light.svg"
-      ></v-img>
-      <v-card class="mx-auto pa-12 pb-8" elevation="8" max-width="448" rounded="lg">
-        <div class="text-subtitle-1 text-medium-emphasis">使用者名稱</div>
-
-        <v-text-field
-          density="compact"
-          placeholder="輸入使用者名稱"
-          prepend-inner-icon="mdi-email-outline"
-          variant="outlined"
-          v-model="loginForm.username"
-          :rules="[() => loginForm.username.length > 0 || '請輸入使用者名稱']"
-          :error-messages="loginValidMessage.username"
-        ></v-text-field>
-
-        <div class="text-subtitle-1 text-medium-emphasis d-flex align-center justify-space-between">
-          密碼
-
-          <!-- <a
-          class="text-caption text-decoration-none text-blue"
-          href="#"
-          rel="noopener noreferrer"
-          target="_blank"
-        >
-          Forgot login password?</a
-        > -->
-        </div>
-
-        <v-text-field
-          :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
-          :type="visible ? 'text' : 'password'"
-          density="compact"
-          placeholder="輸入密碼"
-          prepend-inner-icon="mdi-lock-outline"
-          variant="outlined"
-          v-model="loginForm.password"
-          @click:append-inner="visible = !visible"
-          :rules="[() => loginForm.password.length > 0 || '請輸入密碼']"
-          :error-messages="loginValidMessage.password"
-        ></v-text-field>
-        <v-alert class="mb-5" v-if="msg" density="compact" type="error" variant="tonal">{{
-          msg
-        }}</v-alert>
-        <v-btn block class="mb-5" color="indigo" size="large" variant="elevated" @click="loginEvent"
-          >登入</v-btn
-        >
-      </v-card>
-    </div>
-  </v-form>
-</template>
-<style lang="scss" scoped></style>

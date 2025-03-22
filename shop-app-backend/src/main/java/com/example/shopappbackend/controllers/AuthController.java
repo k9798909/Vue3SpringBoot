@@ -25,16 +25,9 @@ import jakarta.validation.Valid;
 @RestController
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
 public class AuthController {
-    private AuthenticationManager authenticationManager;
-    private JwtTokenUtils jwtTokenUtils;
-    private UsersService usersService;
-
-    public AuthController(AuthenticationManager authenticationManager, JwtTokenUtils jwtTokenUtils,
-                          UsersService usersService) {
-        this.authenticationManager = authenticationManager;
-        this.jwtTokenUtils = jwtTokenUtils;
-        this.usersService = usersService;
-    }
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtils jwtTokenUtils;
+    private final UsersService usersService;
 
     @PostMapping("/login")
     public ResponseEntity<LoginRes> login(@Valid @RequestBody LoginReq req) {

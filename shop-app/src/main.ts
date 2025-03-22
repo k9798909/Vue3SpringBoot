@@ -16,8 +16,8 @@ const vuetify = createVuetify({
   directives
 })
 
-//main.css
-import './assets/main.css'
+//main.scss
+import './assets/main.scss'
 import '@mdi/font/css/materialdesignicons.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 
