@@ -7,9 +7,9 @@ import axios, {
 import * as qs from 'qs'
 import { type MaybeRef, toValue } from 'vue'
 import useUsersStore from '@/stores/UseUsersStore.ts'
-
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 export interface FieldError {
-  [key: string]: never
+  [key: string]: any
 }
 
 enum ContentTypeEnum {
@@ -40,7 +40,6 @@ const responseInterceptors = (instance: AxiosInstance) => {
       return response
     },
     function (error) {
-      console.error('123', error)
       return Promise.reject(error)
     }
   )
