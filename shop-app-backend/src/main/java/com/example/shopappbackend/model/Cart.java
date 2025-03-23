@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 public class Cart implements Serializable {
     private static final long serialVersionUID = 1L;
-    private String username;
     private String productId;
+    private String username;
     private Integer quantity;
 }

@@ -1,29 +1,9 @@
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
-const useStore = defineStore('store', {
-  state: () => {
-    let isShowOverlay: boolean = false
-    let beforeLoginUrl: string = ''
-    return { isShowOverlay, beforeLoginUrl }
-  },
-  getters: {
-    getShowOverlay: (state) => state.isShowOverlay,
-    getBeforeLoginUrl: (state) => state.beforeLoginUrl
-  },
-  actions: {
-    showOverlay(): void {
-      this.isShowOverlay = true
-    },
-    hideOverlay(): void {
-      this.isShowOverlay = false
-    },
-    setBeforeLoginUrl(url: string): void {
-      this.beforeLoginUrl = url
-    },
-    clearBeforeLoginUrl(): void {
-      this.beforeLoginUrl = ''
-    }
+export const useStore = defineStore('store', () => {
+  const beforeLoginUrl = ref<string>()
+  return {
+    beforeLoginUrl
   }
 })
-
-export default useStore

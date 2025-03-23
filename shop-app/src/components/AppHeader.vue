@@ -56,7 +56,6 @@
 
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue'
-import * as UsersService from '@/services/UsersService'
 import headerItems from '@/common/HeaderItems'
 import router from '@/router'
 import useUsersStore from '@/stores/UseUsersStore'
@@ -65,18 +64,18 @@ const usersStore = useUsersStore()
 const isLogin: Ref<boolean> = ref(false)
 const name: Ref<string> = ref('')
 
-async function loadUserStatus(): Promise<void> {
+const loadUserStatus = async () => {
   const users = usersStore.users
   name.value = users?.name || ''
   isLogin.value = !!users
 }
 
-function logoutEvent(): void {
-  UsersService.logout()
+const logoutEvent = () => {
+  usersStore.logout()
   router.push('/login')
 }
 
-onMounted(loadUserStatus)
+onMounted(() => loadUserStatus())
 
 //監聽store有更動觸發init
 watch(

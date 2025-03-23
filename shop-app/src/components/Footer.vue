@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
   <v-footer app absolute class="footer">
     <div class="container">

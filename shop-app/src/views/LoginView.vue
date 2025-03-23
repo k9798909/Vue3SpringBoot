@@ -42,7 +42,7 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { getFieldErrors, isUnauthorized } from '@/http'
 import * as NotificationUtils from '@/utils/NotificationUtils'
-import useStore from '@/stores/UseStore'
+import { useStore } from '@/stores/UseStore'
 import { ViewMsg } from '@/common/MsgEnum'
 import useUsersStore from '@/stores/UseUsersStore.ts'
 import TextField from '@/components/TextField.vue'
@@ -53,6 +53,7 @@ export interface LoginForm {
   password: string
 }
 
+const store = useStore()
 const usersStore = useUsersStore()
 const router = useRouter()
 const visible = ref(false)
@@ -66,8 +67,8 @@ const onLogin = async () => {
   await usersStore
     .login(loginForm.value)
     .then(() => {
-      const toUrl = useStore().getBeforeLoginUrl
-      useStore().clearBeforeLoginUrl()
+      const toUrl = store.beforeLoginUrl
+      store.beforeLoginUrl = ''
       router.push(toUrl || '/index')
     })
     .catch((error) => {

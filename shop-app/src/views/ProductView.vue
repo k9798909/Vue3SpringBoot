@@ -1,37 +1,3 @@
-<script setup lang="ts">
-import Product from '../components/Product.vue'
-import { onMounted, ref, type Ref } from 'vue'
-import * as ProductService from '@/services/ProductService'
-import type ProductDto from '@/types/dto/ProductDto'
-
-const searchInput: Ref<string> = ref('')
-const products: Ref<ProductDto[]> = ref([])
-
-async function initProductList(): Promise<void> {
-  ProductService.findAll()
-    .then((data) => {
-      products.value = data
-    })
-    .catch((e) => {
-      console.error('ProductService findByName', e)
-    })
-}
-
-async function searchEvent(e: MouseEvent): Promise<void> {
-  try {
-    if (!searchInput.value) {
-      products.value = await ProductService.findAll()
-    }
-
-    products.value = await ProductService.findByName(searchInput.value)
-  } catch (error) {
-    console.error('ProductService searchEvent', e)
-  }
-}
-
-onMounted(initProductList)
-</script>
-
 <template>
   <main>
     <div class="mx-auto w-50 d-flex">
@@ -43,12 +9,12 @@ onMounted(initProductList)
         single-line
         hide-details
         v-model="searchInput"
-        @click:append-inner="(e: MouseEvent) => searchEvent(e)"
+        @click:append-inner="() => searchEvent()"
       ></v-text-field>
 
-      <router-link to="/cart" custom v-slot="{ navigate }"
-        ><v-btn class="mx-2 my-auto" @click="navigate">購物車</v-btn></router-link
-      >
+      <router-link to="/cart" custom v-slot="{ navigate }">
+        <v-btn class="mx-2 my-auto" @click="navigate">購物車</v-btn>
+      </router-link>
     </div>
 
     <v-parallax
@@ -65,7 +31,7 @@ onMounted(initProductList)
 
     <v-container v-if="products.length != 0" min-width="500px">
       <v-row>
-        <v-col cols="12" lg="3" md="4" sm="6" v-for="product in products">
+        <v-col cols="12" lg="3" md="4" sm="6" :key="index" v-for="(product, index) in products">
           <Product class="mx-auto" :product="product"></Product>
         </v-col>
       </v-row>
@@ -73,4 +39,37 @@ onMounted(initProductList)
     </v-container>
   </main>
 </template>
+<script setup lang="ts">
+import Product from '../components/Product.vue'
+import { onMounted, ref } from 'vue'
+import type ProductDto from '@/types/dto/ProductDto'
+import { useAxios } from '@/composables/UseAxios.ts'
+
+const searchInput = ref<string>('')
+const products = ref<ProductDto[]>([])
+const { httpGet } = useAxios()
+
+const initProductList = async () => {
+  httpGet<ProductDto[]>('/public/product')
+    .then((res) => {
+      products.value = res.data
+    })
+    .catch((e) => {
+      console.error('ProductService findByName', e)
+    })
+}
+
+const searchEvent = async () => {
+  try {
+    if (!searchInput.value) {
+      products.value = (await httpGet<ProductDto[]>('/public/product')).data
+    }
+    products.value = (await httpGet<ProductDto[]>(`/public/product/name/${searchInput.value}`)).data
+  } catch (error) {
+    console.error('ProductService searchEvent', error)
+  }
+}
+
+onMounted(() => initProductList())
+</script>
 <style lang="scss" scoped></style>

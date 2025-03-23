@@ -1,9 +1,10 @@
 import axios, { AxiosError, type AxiosInstance } from 'axios'
 import { ContentTypeEnum, NetworkErrorCode } from '../common/HttpEnum'
 import type ResponseError from '@/types/http/ResponseError'
-import useStore from '@/stores/UseStore'
+import { useStore } from '@/stores/UseStore'
 import router from '@/router'
 import useUsersStore from '@/stores/UseUsersStore.ts'
+import { useOverlayStore } from '@/stores/UseOverlayStore.ts'
 
 // 建立一個axios實體，並設定預設的baseURL、header、interceptors。
 const getApiClient = (options = {}): AxiosInstance => {
@@ -34,7 +35,7 @@ function requestInterceptors(instance: AxiosInstance) {
   instance.interceptors.request.use(
     function (config) {
       if (config.method === 'post' || config.method === 'put' || config.method === 'delete') {
-        useStore().showOverlay()
+        useOverlayStore().openOverlay()
       }
       return config
     },
@@ -48,7 +49,7 @@ function requestInterceptors(instance: AxiosInstance) {
 function responseInterceptors(instance: AxiosInstance) {
   const hideOverlay = () => {
     setTimeout(() => {
-      useStore().hideOverlay()
+      useStore()
     }, 100)
   }
 
@@ -87,7 +88,7 @@ export function getFieldErrors<T>(error: any): T | undefined {
 export function handleUnauthorized(error: any) {
   const handle = isUnauthorized(error)
   if (handle) {
-    useStore().setBeforeLoginUrl(router.currentRoute.value.fullPath)
+    useStore().beforeLoginUrl = router.currentRoute.value.fullPath
     router.push('/login')
   }
   return handle

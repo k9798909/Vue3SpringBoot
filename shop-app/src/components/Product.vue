@@ -1,18 +1,35 @@
+<template>
+  <v-card width="230px">
+    <v-img :src="imgUrl" height="200px" cover></v-img>
+    <v-card-title>
+      <b>商品名稱：{{ product.name }}</b>
+    </v-card-title>
+    <v-card-subtitle> 售價:{{ product.price }}</v-card-subtitle>
+    <v-card-text>
+      <div class="card-text-content">
+        {{ product.description }}
+      </div>
+    </v-card-text>
+    <v-card-actions>
+      <v-btn color="indigo" variant="elevated" @click="addCardProduct"> 加入購物車</v-btn>
+      <v-btn color="indigo" variant="elevated" @click="productDetail"> 明細</v-btn>
+    </v-card-actions>
+  </v-card>
+</template>
+
 <script setup lang="ts">
-import * as CartService from '@/services/CartService'
 import type ProductDto from '@/types/dto/ProductDto'
 import * as NotificationUtils from '@/utils/NotificationUtils'
 import { handleUnauthorized } from '@/http'
 import { ViewMsg } from '@/common/MsgEnum'
-export interface Prop {
-  product: ProductDto
-}
+import { useAxios } from '@/composables/UseAxios.ts'
 
-const props = defineProps<Prop>()
+const { httpPost } = useAxios()
+const props = defineProps<{ product: ProductDto }>()
 const imgUrl = `/api/public/product/img/${props.product.id}`
 
 async function addCardProduct(): Promise<void> {
-  CartService.updateCartProduct(props.product.id, 1)
+  httpPost('/cart', { productId: props.product.id, quantity: 1 })
     .then(() => {
       NotificationUtils.showSuccessNotification('加入購物車成功')
     })
@@ -25,28 +42,10 @@ async function addCardProduct(): Promise<void> {
     })
 }
 
-async function productDetill(): Promise<void> {
+async function productDetail(): Promise<void> {
   alert('未實作')
 }
 </script>
-<template>
-  <v-card width="230px">
-    <v-img :src="imgUrl" height="200px" cover></v-img>
-    <v-card-title>
-      <b>商品名稱：{{ props.product.name }}</b>
-    </v-card-title>
-    <v-card-subtitle> 售價:{{ props.product.price }} </v-card-subtitle>
-    <v-card-text>
-      <div class="card-text-content">
-        {{ props.product.description }}
-      </div>
-    </v-card-text>
-    <v-card-actions>
-      <v-btn color="indigo" variant="elevated" @click="addCardProduct"> 加入購物車 </v-btn>
-      <v-btn color="indigo" variant="elevated" @click="productDetill"> 明細 </v-btn>
-    </v-card-actions>
-  </v-card>
-</template>
 
 <style lang="scss" scoped>
 .card-text-content {

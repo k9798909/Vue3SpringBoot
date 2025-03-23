@@ -16,8 +16,8 @@ const useUsersStore = defineStore('usersStore', () => {
 
   const login = async (
     loginForm: MaybeRef<{
-      username: string
-      password: string
+      username?: string
+      password?: string
     }>
   ) => {
     const res: ResponseData<LoginResDto> = await httpPost('/login', toValue(loginForm))

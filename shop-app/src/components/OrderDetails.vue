@@ -1,21 +1,13 @@
-<script setup lang="ts">
-import type { OrderDetailDto } from '@/types/dto/OrdersDto'
-
-const props = defineProps<{
-  orderDetails: OrderDetailDto[]
-}>()
-</script>
-
 <template>
   <v-container class="bg-white" style="border-radius: 10px">
     <v-col>
       <h2 class="text-center border-1">訂單明細</h2>
     </v-col>
-    <v-col cols="12" v-for="dt in props.orderDetails">
+    <v-col cols="12" v-for="(dt, index) in props.orderDetails" :key="index">
       <v-card border>
         <div class="d-flex flex-no-wrap justify-space-between p-5">
           <div>
-            <v-card-title class="text-h5"> {{ dt.productDto.name }} </v-card-title>
+            <v-card-title class="text-h5"> {{ dt.productDto.name }}</v-card-title>
             <v-card-subtitle>
               <div class="py-1">價格:{{ dt.price }} 數量:{{ dt.quantity }}</div>
             </v-card-subtitle>
@@ -26,7 +18,7 @@ const props = defineProps<{
               :src="'/api/public/product/img/' + dt.productDto.id"
               class="h-100 w-100"
               style="border-radius: 5px"
-            />
+              alt="" />
           </div>
         </div>
       </v-card>
@@ -34,5 +26,11 @@ const props = defineProps<{
     <v-btn variant="plain" @click="$emit('dialogFalse')" block>返回</v-btn>
   </v-container>
 </template>
+<script setup lang="ts">
+import type { OrderDetailDto } from '@/types/dto/OrdersDto'
 
+const props = defineProps<{
+  orderDetails: OrderDetailDto[]
+}>()
+</script>
 <style lang="scss" scoped></style>

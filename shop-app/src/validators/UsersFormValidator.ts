@@ -1,5 +1,5 @@
 import { isEmailValid, isIdnValid, maxLength, require } from '@/validators/Rules'
-import * as UsersService from '@/services/UsersService'
+import { useAxios } from '@/composables/UseAxios.ts'
 
 // 檢核身分證字號
 export function getIdnRules() {
@@ -38,9 +38,10 @@ export function getChkPasswordRules() {
 
 // 檢核帳號是否存在
 async function checkUsername(username: string) {
-  return UsersService.checkUsername(username)
-    .then((data) => {
-      return data || '帳號已存在'
+  const { httpGet } = useAxios()
+  return httpGet<boolean>('public/users/checkUsername', username)
+    .then((res) => {
+      return res.data || '帳號已存在'
     })
     .catch((error) => {
       console.error(`checkUsername:${checkUsername}`, error)

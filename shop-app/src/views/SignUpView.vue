@@ -87,14 +87,14 @@
           class="w-100 btn btn-success btn-lg"
           color="indigo"
           variant="elevated"
-          >確認</v-btn
-        >
+          >確認
+        </v-btn>
       </v-card>
     </v-form>
 
     <!--  成功視窗 [[ -->
     <SuccessDialog
-      :dialogShow="dialogShow"
+      v-model:show="dialogShow"
       title="註冊成功"
       btnName="回到首頁"
       content="註冊成功點選回到首頁。"
@@ -105,7 +105,6 @@
 </template>
 <script setup lang="ts">
 import { ref, type Ref } from 'vue'
-import * as UsersService from '@/services/UsersService'
 import * as UsersFormValidator from '@/validators/UsersFormValidator'
 import type { SignUpForm, SignUpValidMessage } from '@/types/form/SignUpForm'
 import { useRouter, type Router } from 'vue-router'
@@ -113,9 +112,11 @@ import SuccessDialog from '@/components/SuccessDialog.vue'
 import { getFieldErrors } from '@/http'
 import * as NotificationUtils from '@/utils/NotificationUtils'
 import { ViewMsg } from '@/common/MsgEnum'
+import { useAxios } from '@/composables/UseAxios.ts'
 
+const { httpPost } = useAxios()
 const router: Router = useRouter()
-let dialogShow: Ref<boolean> = ref(false)
+const dialogShow = ref(false)
 const form: Ref<HTMLFormElement | null> = ref(null)
 const formParams: Ref<SignUpForm> = ref({
   name: '',
@@ -146,7 +147,7 @@ async function submit(e: MouseEvent) {
       return
     }
 
-    await UsersService.signUp(formParams.value)
+    await httpPost('public/users/signUp', formParams.value)
     dialogShow.value = true
   } catch (error) {
     const fieldErrors = getFieldErrors<SignUpValidMessage>(error)

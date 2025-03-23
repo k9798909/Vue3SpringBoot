@@ -7,20 +7,10 @@ import axios, {
 import * as qs from 'qs'
 import { type MaybeRef, toValue } from 'vue'
 import useUsersStore from '@/stores/UseUsersStore.ts'
+
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export interface FieldError {
   [key: string]: any
-}
-
-enum ContentTypeEnum {
-  // json
-  JSON = 'application/json',
-  // json
-  TEXT = 'text/plain',
-  // form-data
-  FORM_URLENCODED = 'application/x-www-form-urlencoded',
-  // form-data  upload
-  FORM_DATA = 'multipart/form-data'
 }
 
 const requestInterceptors = (instance: AxiosInstance) => {
@@ -55,7 +45,7 @@ const createInstance = (config: AxiosRequestConfig = {}): AxiosInstance => {
     })
   if (!config.headers) {
     config.headers = {
-      'Content-type': ContentTypeEnum.JSON
+      'Content-type': 'application/json'
     }
   }
   const instance: AxiosInstance = axios.create(config)

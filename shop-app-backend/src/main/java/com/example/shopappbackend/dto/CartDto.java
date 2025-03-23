@@ -1,6 +1,7 @@
 package com.example.shopappbackend.dto;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,10 +11,7 @@ import lombok.NoArgsConstructor;
 public class CartDto implements Serializable {
     private static final long serialVersionUID = 1L;
     private String productId;
+    private String name;
+    private BigDecimal price;
     private Integer quantity;
-
-    public CartDto(String productId, Integer quantity) {
-        this.productId = productId;
-        this.quantity = quantity;
-    }
 }
