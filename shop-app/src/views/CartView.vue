@@ -68,7 +68,6 @@ import { useRouter, type Router } from 'vue-router'
 import * as NotificationUtils from '@/utils/NotificationUtils'
 import { ViewMsg } from '@/common/MsgEnum'
 import { useAxios } from '@/composables/UseAxios.ts'
-import { handleUnauthorized } from '@/http'
 
 const cart: Ref<CartProduct[]> = ref([])
 const message = ref('讀取中...')
@@ -91,11 +90,7 @@ const deleteCartProduct = async (e: MouseEvent, productId: string) => {
       cart.value = cartProducts
     })
     .catch((error) => {
-      if (handleUnauthorized(error)) {
-        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
-        return
-      }
-      console.error('cartService deleteCartProduct error:', e)
+      console.error('cartService deleteCartProduct error:', error)
       NotificationUtils.showErrorNotification(ViewMsg.ServerError)
     })
 }
@@ -129,10 +124,6 @@ const initProducts = () => {
       cart.value = cartProducts
     })
     .catch((error) => {
-      if (handleUnauthorized(error)) {
-        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
-        return
-      }
       console.error('cartService getCartList error:', error)
     })
 }

@@ -40,7 +40,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { getFieldErrors, isUnauthorized } from '@/http'
 import * as NotificationUtils from '@/utils/NotificationUtils'
 import { useStore } from '@/stores/UseStore'
 import { ViewMsg } from '@/common/MsgEnum'
@@ -72,13 +71,11 @@ const onLogin = async () => {
       router.push(toUrl || '/index')
     })
     .catch((error) => {
-      const fieldErrors = getFieldErrors<FieldError>(error)
-      if (fieldErrors) {
-        errorMessage.value = fieldErrors
+      if (error.response?.status === 400) {
+        errorMessage.value = error.response.data.fieldErrors
         return
       }
-
-      if (isUnauthorized(error)) {
+      if (error.response?.status === 401) {
         msg.value = '帳號或密碼錯誤'
         return
       }

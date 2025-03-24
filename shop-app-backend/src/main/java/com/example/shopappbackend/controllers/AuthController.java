@@ -38,12 +38,12 @@ public class AuthController {
         // principal 認證前:username 認證後:Users object、credentials 認證前:密碼
         // 認證後:null、authorities 認証前:null，認証後:權限
         if (authenticate.getPrincipal() instanceof Users users) {
+            String token = jwtTokenUtils.generateToken(users.getUsername());
             LoginRes res = new LoginRes();
             res.setUsername(users.getUsername());
             res.setName(users.getName());
-            String token = jwtTokenUtils.generateToken(users.getUsername());
+            res.setToken(token);
             return ResponseEntity.ok()
-                    .header(HttpHeaders.AUTHORIZATION, token)
                     .body(res);
         } else {
             throw new BadCredentialsException("Authentication failed: Invalid principal type.");

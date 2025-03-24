@@ -21,7 +21,6 @@ const onInput = () => {
 }
 
 watchEffect(() => {
-  console.log(props.custonErrorMessage)
   localErrorMessage.value = props.custonErrorMessage
 })
 

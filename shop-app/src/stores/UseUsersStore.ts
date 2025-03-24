@@ -3,7 +3,6 @@ import type Users from '@/types/stores/Users'
 import type LoginResDto from '@/types/dto/LoginResDto'
 import { ConstantKey } from '@/common/ConstantKey'
 import { useAxios } from '@/composables/UseAxios.ts'
-import type ResponseData from '@/types/http/ResponseData.ts'
 import { type MaybeRef, ref, toValue } from 'vue'
 
 const useUsersStore = defineStore('usersStore', () => {
@@ -20,8 +19,10 @@ const useUsersStore = defineStore('usersStore', () => {
       password?: string
     }>
   ) => {
-    const res: ResponseData<LoginResDto> = await httpPost('/login', toValue(loginForm))
-    users.value = { ...res.data, token: res.headers['authorization'] }
+    const data: LoginResDto = await httpPost<LoginResDto>('/login', toValue(loginForm), {
+      axiosErrorHandle: false
+    })
+    users.value = data
     localStorage.setItem(ConstantKey.USERS_KEY, JSON.stringify(toValue(users)))
   }
 

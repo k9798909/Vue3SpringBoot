@@ -109,7 +109,6 @@ import * as UsersFormValidator from '@/validators/UsersFormValidator'
 import type { SignUpForm, SignUpValidMessage } from '@/types/form/SignUpForm'
 import { useRouter, type Router } from 'vue-router'
 import SuccessDialog from '@/components/SuccessDialog.vue'
-import { getFieldErrors } from '@/http'
 import * as NotificationUtils from '@/utils/NotificationUtils'
 import { ViewMsg } from '@/common/MsgEnum'
 import { useAxios } from '@/composables/UseAxios.ts'
@@ -150,13 +149,6 @@ async function submit(e: MouseEvent) {
     await httpPost('public/users/signUp', formParams.value)
     dialogShow.value = true
   } catch (error) {
-    const fieldErrors = getFieldErrors<SignUpValidMessage>(error)
-    if (fieldErrors) {
-      validMessage.value = fieldErrors
-      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
-      return
-    }
-
     console.error('server error', error)
     NotificationUtils.showErrorNotification(ViewMsg.ServerError)
   }

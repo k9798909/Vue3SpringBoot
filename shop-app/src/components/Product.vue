@@ -20,8 +20,6 @@
 <script setup lang="ts">
 import type ProductDto from '@/types/dto/ProductDto'
 import * as NotificationUtils from '@/utils/NotificationUtils'
-import { handleUnauthorized } from '@/http'
-import { ViewMsg } from '@/common/MsgEnum'
 import { useAxios } from '@/composables/UseAxios.ts'
 
 const { httpPost } = useAxios()
@@ -29,17 +27,9 @@ const props = defineProps<{ product: ProductDto }>()
 const imgUrl = `/api/public/product/img/${props.product.id}`
 
 async function addCardProduct(): Promise<void> {
-  httpPost('/cart', { productId: props.product.id, quantity: 1 })
-    .then(() => {
-      NotificationUtils.showSuccessNotification('加入購物車成功')
-    })
-    .catch((error) => {
-      if (handleUnauthorized(error)) {
-        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
-        return
-      }
-      console.error('addCardProduct error', error)
-    })
+  httpPost('/cart', { productId: props.product.id, quantity: 1 }).then(() => {
+    NotificationUtils.showSuccessNotification('加入購物車成功')
+  }).catch()
 }
 
 async function productDetail(): Promise<void> {
