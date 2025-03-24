@@ -37,18 +37,13 @@ import { onMounted, ref } from 'vue'
 import OrderDetails from '@/components/OrderDetails.vue'
 import { useAxios } from '@/composables/UseAxios'
 
-const axios = useAxios()
+const { httpGet } = useAxios()
 const orders = ref<OrdersDto[]>([])
 const dialogShow = ref<boolean>(false)
 const orderDetails = ref<OrderDetailDto[]>([])
 
 const initOrders = async () => {
-  axios
-    .httpGet<OrdersDto[]>('/orders')
-    .then((res) => {
-      orders.value.push(...res.data)
-    })
-    .catch((e) => console.error(e))
+  orders.value = await httpGet<OrdersDto[]>('/orders')
 }
 
 const dtlEvent = (order: OrdersDto) => {

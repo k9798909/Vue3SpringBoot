@@ -95,7 +95,6 @@ import { onMounted, ref, type Ref } from 'vue'
 import * as UsersFormValidator from '@/validators/UsersFormValidator'
 import type { EditUsersForm, EditUsersValidMessage } from '@/types/form/EditUsersForm'
 import SuccessDialog from '@/components/SuccessDialog.vue'
-import { getFieldErrors } from '@/http'
 import * as NotificationUtils from '@/utils/NotificationUtils'
 import { ViewMsg } from '@/common/MsgEnum'
 import { useAxios } from '@/composables/UseAxios.ts'
@@ -126,13 +125,6 @@ const submit = async (e: MouseEvent) => {
     isEdit.value = false
     dialogShow.value = true
   } catch (error) {
-    const fieldErrors = getFieldErrors<EditUsersValidMessage>(error)
-    if (fieldErrors) {
-      editUsersValidMessage.value = fieldErrors
-      NotificationUtils.showErrorNotification(ViewMsg.FiledError)
-      return
-    }
-
     console.error('server error', error)
     NotificationUtils.showErrorNotification(ViewMsg.ServerError)
   }
@@ -140,14 +132,14 @@ const submit = async (e: MouseEvent) => {
 
 const initEditForm = async (): Promise<void> => {
   try {
-    editForm.value = (await httpGet<EditUsersForm>('/users/edit')).data
+    editForm.value = await httpGet<EditUsersForm>('/users/edit')
   } catch (error) {
     console.error('server error', error)
     NotificationUtils.showErrorNotification(ViewMsg.ServerError)
   }
 }
 
-onMounted(initEditForm)
+onMounted(() => initEditForm())
 </script>
 <style lang="scss" scoped>
 :deep(.v-field__input:read-only) {

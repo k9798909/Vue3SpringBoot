@@ -1,5 +1,5 @@
 <template>
-  <v-card width="230px">
+  <v-card width="250">
     <v-img :src="imgUrl" height="200px" cover></v-img>
     <v-card-title>
       <b>商品名稱：{{ product.name }}</b>
@@ -26,10 +26,9 @@ const { httpPost } = useAxios()
 const props = defineProps<{ product: ProductDto }>()
 const imgUrl = `/api/public/product/img/${props.product.id}`
 
-async function addCardProduct(): Promise<void> {
-  httpPost('/cart', { productId: props.product.id, quantity: 1 }).then(() => {
-    NotificationUtils.showSuccessNotification('加入購物車成功')
-  }).catch()
+const addCardProduct = async () => {
+  await httpPost('/cart', { productId: props.product.id, quantity: 1 })
+  NotificationUtils.showSuccessNotification('加入購物車成功')
 }
 
 async function productDetail(): Promise<void> {

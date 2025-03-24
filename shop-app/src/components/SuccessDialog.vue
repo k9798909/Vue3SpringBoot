@@ -1,5 +1,4 @@
 <template>
-  <!--  成功視窗 [[ -->
   <v-dialog v-model="show" width="50%">
     <v-sheet
       elevation="12"
@@ -28,7 +27,6 @@
       </div>
     </v-sheet>
   </v-dialog>
-  <!--  ]] -->
 </template>
 <script setup lang="ts">
 defineProps<{

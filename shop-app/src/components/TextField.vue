@@ -9,7 +9,7 @@ import type { VTextField } from 'vuetify/lib/components/index.mjs'
 type TextFieldProps = InstanceType<typeof VTextField>['$props']
 
 interface Props extends /* @vue-ignore */ TextFieldProps {
-  custonErrorMessage?: string | string[]
+  customErrorMessage?: string | string[]
 }
 
 const props = defineProps<Props>()
@@ -21,7 +21,7 @@ const onInput = () => {
 }
 
 watchEffect(() => {
-  localErrorMessage.value = props.custonErrorMessage
+  localErrorMessage.value = props.customErrorMessage
 })
 
 defineOptions({ inheritAttrs: false })

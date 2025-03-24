@@ -50,13 +50,13 @@ public class UsersService implements UserDetailsService {
                     EditUsersRes res = new EditUsersRes();
                     res.setId(users.getId());
                     res.setName(users.getName());
-                    res.setBirthday(users.getBirthday().format(DateTimeFormatter.ISO_DATE).toString());
+                    res.setBirthday(users.getBirthday().format(DateTimeFormatter.ISO_DATE));
                     res.setEmail(users.getEmail());
                     res.setAddress(users.getAddress());
                     res.setUsername(users.getUsername());
                     return res;
                 })
-                .orElseThrow(() -> new RuntimeException("找不到使用者"));
+                .orElseThrow(() -> new UsernameNotFoundException("找不到使用者"));
     }
 
     @Transactional

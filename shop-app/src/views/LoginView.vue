@@ -11,7 +11,7 @@
           variant="outlined"
           color="primary"
           required
-          :custonErrorMessage="errorMessage?.username"
+          :customErrorMessage="errorMessage?.username"
           class="mb-2"
         ></TextField>
         <TextField
@@ -25,27 +25,23 @@
           label="密碼"
           color="primary"
           @click:append-inner="visible = !visible"
-          :custonErrorMessage="errorMessage?.password"
+          :customErrorMessage="errorMessage?.password"
           class="mb-2"
         >
         </TextField>
-        <v-alert v-if="msg" class="mb-5" density="compact" type="error" variant="tonal"
-          >{{ msg }}
-        </v-alert>
         <v-btn block color="indigo" size="large" variant="elevated" @click="onLogin">登入</v-btn>
       </v-form>
     </v-card-text>
   </v-card>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, toValue } from 'vue'
 import { useRouter } from 'vue-router'
-import * as NotificationUtils from '@/utils/NotificationUtils'
 import { useStore } from '@/stores/UseStore'
-import { ViewMsg } from '@/common/MsgEnum'
 import useUsersStore from '@/stores/UseUsersStore.ts'
 import TextField from '@/components/TextField.vue'
-import type { FieldError } from '@/composables/UseAxios.ts'
+import { type FieldError, useAxios } from '@/composables/UseAxios.ts'
+import type Users from '@/types/stores/Users.ts'
 
 export interface LoginForm {
   username: string
@@ -54,33 +50,18 @@ export interface LoginForm {
 
 const store = useStore()
 const usersStore = useUsersStore()
+const { httpPost } = useAxios()
 const router = useRouter()
 const visible = ref(false)
-const msg = ref('')
 const loginForm = ref<Partial<LoginForm>>({})
 const errorMessage = ref<FieldError>()
 
 const onLogin = async () => {
-  msg.value = ''
   errorMessage.value = undefined
-  await usersStore
-    .login(loginForm.value)
-    .then(() => {
-      const toUrl = store.beforeLoginUrl
-      store.beforeLoginUrl = ''
-      router.push(toUrl || '/index')
-    })
-    .catch((error) => {
-      if (error.response?.status === 400) {
-        errorMessage.value = error.response.data.fieldErrors
-        return
-      }
-      if (error.response?.status === 401) {
-        msg.value = '帳號或密碼錯誤'
-        return
-      }
-      console.error('server error', error)
-      NotificationUtils.showErrorNotification(ViewMsg.ServerError)
-    })
+  const users = await httpPost<Users>('/login', toValue(loginForm))
+  usersStore.login(users)
+  const toUrl = store.beforeLoginUrl
+  store.beforeLoginUrl = ''
+  await router.push(toUrl || '/index')
 }
 </script>

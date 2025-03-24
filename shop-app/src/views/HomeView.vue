@@ -1,5 +1,3 @@
-<script setup lang="ts"></script>
-
 <template>
   <main>
     <section class="text-center">
@@ -37,7 +35,7 @@
     </section>
   </main>
 </template>
-
+<script setup lang="ts"></script>
 <style lang="scss" scoped>
 .accent {
   background: -webkit-linear-gradient(315deg, #42d392 25%, #647eff);

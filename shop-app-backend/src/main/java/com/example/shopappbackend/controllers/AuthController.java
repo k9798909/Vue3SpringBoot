@@ -1,5 +1,6 @@
 package com.example.shopappbackend.controllers;
 
+import com.example.shopappbackend.exception.LogicRuntimeException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -31,22 +33,20 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<LoginRes> login(@Valid @RequestBody LoginReq req) {
-        // 用ProviderManager進行認證
-        Authentication authenticate = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
-
-        // principal 認證前:username 認證後:Users object、credentials 認證前:密碼
-        // 認證後:null、authorities 認証前:null，認証後:權限
-        if (authenticate.getPrincipal() instanceof Users users) {
+        try {
+            // 用ProviderManager進行認證
+            Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(req.getUsername(), req.getPassword()));
+            // principal 認證前:username 認證後:Users object、credentials 認證前:密碼
+            // 認證後:null、authorities 認証前:null，認証後:權限
+            Users users = (Users) authenticate.getPrincipal();
             String token = jwtTokenUtils.generateToken(users.getUsername());
             LoginRes res = new LoginRes();
             res.setUsername(users.getUsername());
             res.setName(users.getName());
             res.setToken(token);
-            return ResponseEntity.ok()
-                    .body(res);
-        } else {
-            throw new BadCredentialsException("Authentication failed: Invalid principal type.");
+            return ResponseEntity.ok().body(res);
+        } catch (BadCredentialsException | UsernameNotFoundException e) {
+            throw new LogicRuntimeException("帳號或密碼錯誤");
         }
     }
 

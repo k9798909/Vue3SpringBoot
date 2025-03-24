@@ -1,10 +1,12 @@
 <template>
   <v-app>
-    <AppHeader></AppHeader>
-    <v-main>
-      <router-view class="py-5"></router-view>
+    <AppHeader class="header"></AppHeader>
+    <v-main scrollable>
+      <v-container class="main-container">
+        <router-view></router-view>
+      </v-container>
+      <Footer class="footer"></Footer>
     </v-main>
-    <Footer></Footer>
     <Notifications :classes="['custom-vue-notification']" position="bottom right" :max="1" />
     <Overlay></Overlay>
   </v-app>
@@ -17,4 +19,12 @@ import Overlay from '@/components/Overlay.vue'
 import { Notifications } from '@kyvg/vue3-notification'
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.header {
+  height: 70px;
+}
+
+.main-container {
+  min-height: calc(100vh - 70px - 70px);
+}
+</style>

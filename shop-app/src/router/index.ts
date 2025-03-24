@@ -81,7 +81,7 @@ async function loginCheck(to: RouteLocationNormalized) {
     }
 
     const token = usersStore.users?.token
-    const isVerify = (await httpPost<boolean>('/public/tokenVerify', { token })).data
+    const isVerify = await httpPost<boolean>('/public/tokenVerify', { token })
 
     //確定token是否過期如果過期將token刪除
     if (!isVerify) {

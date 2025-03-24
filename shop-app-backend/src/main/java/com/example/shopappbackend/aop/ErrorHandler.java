@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -75,10 +76,19 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(BadCredentialsException.class)
     protected ResponseEntity<Void> handleBadCredentialsException(BadCredentialsException ex) {
-        ErrorDto res = new ErrorDto(ErrorCode.UNPROCESSABLE_ENTITY.code(), ex.getMessage(), null);
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
+    /**
+     * 統一處理 UsernameNotFoundException (401)
+     *
+     * @param ex      UsernameNotFoundException
+     * @return ResponseEntity
+     */
+    @ExceptionHandler(UsernameNotFoundException.class)
+    protected ResponseEntity<Void> handleBadCredentialsException(UsernameNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+    }
 
     /**
      * 統一處理 @Valid 錯誤，controller

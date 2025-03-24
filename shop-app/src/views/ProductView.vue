@@ -20,8 +20,9 @@
     <v-parallax
       src="https://cdn.vuetifyjs.com/images/backgrounds/vbanner.jpg"
       class="my-3 mx-auto"
-      max-height="200px"
-      width="80%"
+      max-height="250"
+      min-width="900"
+      max-width="1300"
     >
       <div class="d-flex flex-column fill-height justify-center align-center text-white">
         <h1 class="text-h4 font-weight-thin mb-4">Vuetify</h1>
@@ -29,14 +30,12 @@
       </div>
     </v-parallax>
 
-    <v-container v-if="products.length != 0" min-width="500px">
-      <v-row>
-        <v-col cols="12" lg="3" md="4" sm="6" :key="index" v-for="(product, index) in products">
-          <Product class="mx-auto" :product="product"></Product>
-        </v-col>
-      </v-row>
-      <v-pagination :length="1"></v-pagination>
+    <v-container class="d-flex flex-wrap ga-10" v-if="products.length != 0" min-width="900" max-width="1200">
+      <div :key="index" v-for="(product, index) in products">
+        <Product :product="product"></Product>
+      </div>
     </v-container>
+    <v-pagination :length="1"></v-pagination>
   </main>
 </template>
 <script setup lang="ts">
@@ -50,24 +49,15 @@ const products = ref<ProductDto[]>([])
 const { httpGet } = useAxios()
 
 const initProductList = async () => {
-  httpGet<ProductDto[]>('/public/product')
-    .then((res) => {
-      products.value = res.data
-    })
-    .catch((e) => {
-      console.error('ProductService findByName', e)
-    })
+  products.value = await httpGet<ProductDto[]>('/public/product')
 }
 
 const searchEvent = async () => {
-  try {
-    if (!searchInput.value) {
-      products.value = (await httpGet<ProductDto[]>('/public/product')).data
-    }
-    products.value = (await httpGet<ProductDto[]>(`/public/product/name/${searchInput.value}`)).data
-  } catch (error) {
-    console.error('ProductService searchEvent', error)
+  if (!searchInput.value) {
+    products.value = await httpGet<ProductDto[]>('/public/product')
+    return
   }
+  products.value = await httpGet<ProductDto[]>(`/public/product/name/${searchInput.value}`)
 }
 
 onMounted(() => initProductList())

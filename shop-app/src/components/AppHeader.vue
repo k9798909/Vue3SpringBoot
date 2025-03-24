@@ -57,9 +57,10 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, type Ref } from 'vue'
 import headerItems from '@/common/HeaderItems'
-import router from '@/router'
 import useUsersStore from '@/stores/UseUsersStore'
+import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const usersStore = useUsersStore()
 const isLogin: Ref<boolean> = ref(false)
 const name: Ref<string> = ref('')

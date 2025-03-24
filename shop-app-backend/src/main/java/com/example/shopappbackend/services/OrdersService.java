@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.example.shopappbackend.dto.OrderDetailsDto;
@@ -39,11 +40,11 @@ public class OrdersService {
 
     public List<OrderDto> findByUsername(String username) {
         Users users = usersService.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("找不到登入者訂單資訊"));
+                .orElseThrow(() -> new UsernameNotFoundException("找不到登入者訂單資訊"));
 
         List<Orders> orders = orderRepository.findByUserId(users.getId());
 
-        List<OrderDto> orderDtos = orders.stream().map(t -> {
+        return orders.stream().map(t -> {
             String status = OrderStatus.toName(t.getStatus());
 
             List<OrderDetailsDto> dts = t.getOrderDetails().stream().map(dt -> {
@@ -73,8 +74,6 @@ public class OrdersService {
 
             return dto;
         }).collect(Collectors.toList());
-
-        return orderDtos;
     }
 
     @Transactional

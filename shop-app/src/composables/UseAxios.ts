@@ -1,18 +1,12 @@
-import axios, {
-  AxiosError,
-  type AxiosInstance,
-  type AxiosRequestConfig,
-  type AxiosResponse,
-  mergeConfig
-} from 'axios'
+import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, mergeConfig } from 'axios'
 import * as qs from 'qs'
 import { type MaybeRef, toValue } from 'vue'
 import useUsersStore from '@/stores/UseUsersStore.ts'
 import { useOverlayStore } from '@/stores/UseOverlayStore.ts'
 import { useStore } from '@/stores/UseStore.ts'
-import router from '@/router'
 import * as NotificationUtils from '@/utils/NotificationUtils.ts'
 import { ViewMsg } from '@/common/MsgEnum.ts'
+import { useRouter } from 'vue-router'
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export interface FieldError {
@@ -21,7 +15,6 @@ export interface FieldError {
 
 export interface AxiosConfig extends AxiosRequestConfig {
   mask?: boolean //遮罩
-  axiosErrorHandle?: boolean //是否處理axios錯誤
 }
 
 const requestInterceptors = (instance: AxiosInstance) => {
@@ -38,25 +31,29 @@ const requestInterceptors = (instance: AxiosInstance) => {
 const responseInterceptors = (instance: AxiosInstance) => {
   const overlayStore = useOverlayStore()
   const store = useStore()
+  const router = useRouter()
+  const users = useUsersStore()
+
   instance.interceptors.response.use(
     function (response) {
       overlayStore.closeOverlay()
       return response.data
     },
-    function (error) {
+    async function(error) {
       const axiosError: AxiosError = error as AxiosError
-      const config = axiosError.config as AxiosConfig
-      if (config.axiosErrorHandle == undefined || config.axiosErrorHandle) {
-        if (400 == axiosError.response?.status) {
-          NotificationUtils.showWaringNotification(ViewMsg.FiledError)
-        } else if (401 == axiosError.response?.status) {
-          store.beforeLoginUrl = router.currentRoute.value.fullPath
-          NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
-          router.push('/login')
-        } else {
-          console.error('server error', error)
-          NotificationUtils.showErrorNotification(ViewMsg.ServerError)
-        }
+      if (400 == axiosError.response?.status) {
+        NotificationUtils.showErrorNotification(ViewMsg.FiledError)
+      } else if (401 == axiosError.response?.status) {
+        store.beforeLoginUrl = router.currentRoute.value.fullPath
+        NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
+        users.logout()
+        await router.push('/login')
+      } else if (422 == axiosError.response?.status) {
+        const data = axiosError.response?.data as { message: string }
+        NotificationUtils.showErrorNotification(data.message)
+      } else {
+        console.error('server error', error)
+        NotificationUtils.showErrorNotification(ViewMsg.ServerError)
       }
       overlayStore.closeOverlay()
       return Promise.reject(error)
@@ -130,7 +127,7 @@ export const useAxios = () => {
       overlayStore.openOverlay()
     }
 
-    mergeConfig(config, { headers: { Authorization: 'Bearer ' + usersStore.users?.token } })
+    config = mergeConfig(config, { headers: { Authorization: 'Bearer ' + usersStore.users?.token } })
     if (['GET', 'DELETE'].includes(method)) {
       config.params = toValue(requestData)
     }

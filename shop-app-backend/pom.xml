@@ -19,7 +19,7 @@
         <java.version>21</java.version>
         <postgresql.version>42.7.4</postgresql.version>
         <jjwt.version>0.11.5</jjwt.version>
-        <spring-data-redis.version>3.1.5</spring-data-redis.version>
+        <spring-data-redis.version>3.4.4</spring-data-redis.version>
         <jedis.version>5.2.0</jedis.version>
         <lombok.version>1.18.30</lombok.version>
     </properties>

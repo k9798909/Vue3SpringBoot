@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -21,9 +22,10 @@ import io.jsonwebtoken.security.Keys;
 public class JwtTokenUtils {
     private static final Logger log = LoggerFactory.getLogger(JwtTokenUtils.class);
 
-    private Key secretKey;
-    private long expirationTime;
+    private final Key secretKey;
+    private final long expirationTime;
 
+    @Autowired
     public JwtTokenUtils(
             @Value("${jwt.expiration.time}") long expirationTime,
             @Value("${jwt.secret.key:1hGfRtZsL7pOqXyW9uBvNc6mKjEiAx3d2gVfRtZsL7pOqXyW9uBvNc6mKjEiAx3d2gVfRtZsL7pOqX}") String secretKey) {

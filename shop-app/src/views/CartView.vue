@@ -66,7 +66,6 @@ import { onMounted, ref, type Ref } from 'vue'
 import type CartProduct from '@/types/dto/CartProductDto'
 import { useRouter, type Router } from 'vue-router'
 import * as NotificationUtils from '@/utils/NotificationUtils'
-import { ViewMsg } from '@/common/MsgEnum'
 import { useAxios } from '@/composables/UseAxios.ts'
 
 const cart: Ref<CartProduct[]> = ref([])
@@ -75,57 +74,32 @@ const router: Router = useRouter()
 const { httpGet, httpDelete, httpPost } = useAxios()
 
 const deleteCartProduct = async (e: MouseEvent, productId: string) => {
-  httpDelete<CartProduct[]>(`/cart/${productId}`)
-    .then((res) => res.data)
-    .then((cartProducts) =>
-      cartProducts.map((t) => {
-        return { ...t, imgUrl: `/api/public/product/img/${t.productId}` }
-      })
-    )
-    .then((cartProducts) => {
-      if (cartProducts.length == 0) {
-        message.value = '購物車無商品'
-        return
-      }
-      cart.value = cartProducts
-    })
-    .catch((error) => {
-      console.error('cartService deleteCartProduct error:', error)
-      NotificationUtils.showErrorNotification(ViewMsg.ServerError)
-    })
+  const data = await httpDelete<CartProduct[]>(`/cart/${productId}`)
+  cart.value = data.map((t) => {
+    return { ...t, imgUrl: `/api/public/product/img/${t.productId}` }
+  })
+  if (cart.value.length == 0) {
+    message.value = '購物車無商品'
+    return
+  }
 }
 
 const checkout = async () => {
   await httpPost('/orders')
-    .then(() => {
-      NotificationUtils.showSuccessNotification('結帳成功')
-      router.push('/orders')
-    })
-    .catch((e) => {
-      NotificationUtils.showErrorNotification('結帳失敗')
-      console.error(e)
-    })
+  NotificationUtils.showSuccessNotification('結帳成功')
+  await router.push('/orders')
 }
 
-const initProducts = () => {
-  cart.value = []
-  httpGet<CartProduct[]>(`/cart`)
-    .then((res) => res.data)
-    .then((cartProducts) =>
-      cartProducts.map((t) => {
-        return { ...t, imgUrl: `/api/public/product/img/${t.productId}` }
-      })
-    )
-    .then((cartProducts) => {
-      if (cartProducts.length == 0) {
-        message.value = '購物車無商品'
-        return
-      }
-      cart.value = cartProducts
-    })
-    .catch((error) => {
-      console.error('cartService getCartList error:', error)
-    })
+const initProducts = async () => {
+  const data = await httpGet<CartProduct[]>(`/cart`)
+  cart.value = data.map((t: CartProduct) => {
+    return { ...t, imgUrl: `/api/public/product/img/${t.productId}` }
+  })
+
+  if (cart.value.length == 0) {
+    message.value = '購物車無商品'
+    return
+  }
 }
 
 onMounted(() => initProducts())

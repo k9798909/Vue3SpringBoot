@@ -1,8 +1,8 @@
 export interface OrdersDto {
   orderId: number
-  orderDate: String
+  orderDate: string
   totalPrice: number
-  status: String
+  status: string
   orderDetails: OrderDetailDto[]
 }
 
@@ -13,9 +13,9 @@ export interface OrderDetailDto {
 }
 
 export interface ProductDto {
-  id: String
-  name: String
-  description: String
+  id: string
+  name: string
+  description: string
   price: number
   quantity: number
 }
