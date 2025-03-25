@@ -28,6 +28,7 @@
   "devDependencies": {
     "@mdi/font": "^7.4.47",
     "@tsconfig/node22": "^22.0.0",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^22.13.9",
     "@types/qs": "^6.9.18",
     "@vitejs/plugin-vue": "^5.2.1",

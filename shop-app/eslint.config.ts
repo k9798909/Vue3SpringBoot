@@ -23,7 +23,7 @@ export default defineConfigWithVueTs(
   skipFormatting,
   {
     rules: {
-      'vue/multi-word-component-names': 'off' // 忽略多字元組件名稱檢查
+      'vue/multi-word-component-names': 'off' // 忽略多字元組件名稱檢查,
     }
   }
 )

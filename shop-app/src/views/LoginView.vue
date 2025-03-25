@@ -4,18 +4,18 @@
       <p class="text-h5 font-weight-black mb-5 text-center">登入</p>
       <v-form>
         <TextField
-          v-model="loginForm.username"
+          v-model="formData.username"
           label="使用者名稱"
           placeholder="輸入使用者名稱"
           prepend-inner-icon="mdi-email-outline"
           variant="outlined"
           color="primary"
           required
-          :customErrorMessage="errorMessage?.username"
+          :customErrorMessage="formError?.username"
           class="mb-2"
         ></TextField>
         <TextField
-          v-model="loginForm.password"
+          v-model="formData.password"
           :append-inner-icon="visible ? 'mdi-eye-off' : 'mdi-eye'"
           :type="visible ? 'text' : 'password'"
           placeholder="輸入密碼"
@@ -25,7 +25,7 @@
           label="密碼"
           color="primary"
           @click:append-inner="visible = !visible"
-          :customErrorMessage="errorMessage?.password"
+          :customErrorMessage="formError?.password"
           class="mb-2"
         >
         </TextField>
@@ -35,12 +35,12 @@
   </v-card>
 </template>
 <script setup lang="ts">
-import { ref, toValue } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStore } from '@/stores/UseStore'
 import useUsersStore from '@/stores/UseUsersStore.ts'
 import TextField from '@/components/TextField.vue'
-import { type FieldError, useAxios } from '@/composables/UseAxios.ts'
+import { useFormState } from '@/composables/UseFormState.ts'
 import type Users from '@/types/stores/Users.ts'
 
 export interface LoginForm {
@@ -48,17 +48,14 @@ export interface LoginForm {
   password: string
 }
 
+const { formData, formError, submitFormData } = useFormState<LoginForm>()
 const store = useStore()
 const usersStore = useUsersStore()
-const { httpPost } = useAxios()
 const router = useRouter()
 const visible = ref(false)
-const loginForm = ref<Partial<LoginForm>>({})
-const errorMessage = ref<FieldError>()
 
 const onLogin = async () => {
-  errorMessage.value = undefined
-  const users = await httpPost<Users>('/login', toValue(loginForm))
+  const users = await submitFormData<Users>('/login', { method: 'POST' })
   usersStore.login(users)
   const toUrl = store.beforeLoginUrl
   store.beforeLoginUrl = ''

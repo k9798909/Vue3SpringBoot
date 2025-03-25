@@ -4,7 +4,6 @@ import * as NotificationUtils from '@/utils/NotificationUtils'
 import { ViewMsg } from '@/common/MsgEnum'
 import useUsersStore from '@/stores/UseUsersStore.ts'
 import { useStore } from '@/stores/UseStore.ts'
-import { useAxios } from '@/composables/UseAxios.ts'
 
 const productViewName = 'product'
 const loginViewName = 'login'
@@ -71,25 +70,18 @@ router.beforeEach(loginCheck)
 //檢查是否有登入或逾期
 async function loginCheck(to: RouteLocationNormalized) {
   try {
-    const usersStore = useUsersStore()
+    const { isLogin, verifyTokenDone, checkToken } = useUsersStore()
     const store = useStore()
-    const { httpPost } = useAxios()
 
-    //頁面是否需要驗證
+    if (!verifyTokenDone) {
+      await checkToken()
+    }
+
     if (notCheckLogin.includes(to.name!.toString())) {
       return
     }
 
-    const token = usersStore.users?.token
-    const isVerify = await httpPost<boolean>('/public/tokenVerify', { token })
-
-    //確定token是否過期如果過期將token刪除
-    if (!isVerify) {
-      usersStore.logout()
-    }
-
-    //檢查token是否有效
-    if (token && isVerify) {
+    if (isLogin()) {
       return
     }
 

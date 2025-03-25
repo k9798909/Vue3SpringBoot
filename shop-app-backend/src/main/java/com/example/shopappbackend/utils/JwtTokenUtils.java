@@ -28,7 +28,7 @@ public class JwtTokenUtils {
     @Autowired
     public JwtTokenUtils(
             @Value("${jwt.expiration.time}") long expirationTime,
-            @Value("${jwt.secret.key:1hGfRtZsL7pOqXyW9uBvNc6mKjEiAx3d2gVfRtZsL7pOqXyW9uBvNc6mKjEiAx3d2gVfRtZsL7pOqX}") String secretKey) {
+            @Value("${jwt.secret.key:1hGfRtZsL1pOqXyW9uBvNc6mKjEiAx3d2gVfRtZs17pOqXyW9uBvNc6mKjEiAx3d2gVfRtZsL7pOqX}") String secretKey) {
         this.expirationTime = expirationTime;
         this.secretKey = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }

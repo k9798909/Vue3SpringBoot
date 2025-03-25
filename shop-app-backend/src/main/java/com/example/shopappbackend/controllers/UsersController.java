@@ -26,9 +26,9 @@ import jakarta.validation.Valid;
 public class UsersController {
     private final UsersService usersService;
 
-    @GetMapping("/public/users/checkUsername")
-    public ResponseEntity<Boolean> checkUsername(@RequestParam String username) {
-        return ResponseEntity.ok(usersService.findByUsername(username).isEmpty());
+    @PostMapping("/public/users/checkUsername")
+    public ResponseEntity<Boolean> checkUsername(@RequestBody SignUpReq req) {
+        return ResponseEntity.ok(usersService.findByUsername(req.getUsername()).isEmpty());
     }
 
     @PostMapping("/public/users/signUp")

@@ -22,6 +22,8 @@ import './assets/main.scss'
 import '@mdi/font/css/materialdesignicons.css'
 import '@fortawesome/fontawesome-free/css/all.css'
 import { AxiosError } from 'axios'
+import * as NotificationUtils from '@/utils/NotificationUtils.ts'
+import { ViewMsg } from '@/common/MsgEnum.ts'
 
 const app = createApp(App)
 
@@ -32,6 +34,7 @@ app.config.errorHandler = (error, instance, info) => {
   console.error('An error occurred:', error)
   console.log('In component instance:', instance)
   console.log('Error info:', info)
+  NotificationUtils.showErrorNotification(ViewMsg.Error)
 }
 
 window.addEventListener('unhandledrejection', (event) => {

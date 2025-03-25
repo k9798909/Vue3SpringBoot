@@ -1,4 +1,4 @@
-import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig, mergeConfig } from 'axios'
+import axios, { AxiosError, type AxiosInstance, type AxiosRequestConfig } from 'axios'
 import * as qs from 'qs'
 import { type MaybeRef, toValue } from 'vue'
 import useUsersStore from '@/stores/UseUsersStore.ts'
@@ -7,6 +7,7 @@ import { useStore } from '@/stores/UseStore.ts'
 import * as NotificationUtils from '@/utils/NotificationUtils.ts'
 import { ViewMsg } from '@/common/MsgEnum.ts'
 import { useRouter } from 'vue-router'
+import _, { upperCase } from 'lodash'
 
 /* eslint-disable  @typescript-eslint/no-explicit-any */
 export interface FieldError {
@@ -15,6 +16,12 @@ export interface FieldError {
 
 export interface AxiosConfig extends AxiosRequestConfig {
   mask?: boolean //遮罩
+}
+
+export interface ResponseError {
+  code: string
+  message: string
+  fieldErrors: FieldError
 }
 
 const requestInterceptors = (instance: AxiosInstance) => {
@@ -31,31 +38,38 @@ const requestInterceptors = (instance: AxiosInstance) => {
 const responseInterceptors = (instance: AxiosInstance) => {
   const overlayStore = useOverlayStore()
   const store = useStore()
-  const router = useRouter()
   const users = useUsersStore()
+  const router = useRouter()
 
   instance.interceptors.response.use(
     function (response) {
       overlayStore.closeOverlay()
-      return response.data
+      return response
     },
-    async function(error) {
+    async function (error) {
+      overlayStore.closeOverlay()
       const axiosError: AxiosError = error as AxiosError
       if (400 == axiosError.response?.status) {
-        NotificationUtils.showErrorNotification(ViewMsg.FiledError)
+        const errorData = axiosError.response?.data as ResponseError
+        const fieldErrors = {}
+        if (errorData.fieldErrors) {
+          for (const [key, value] of Object.entries(errorData.fieldErrors)) {
+            _.set(fieldErrors, key, value)
+          }
+        }
+        errorData.fieldErrors = fieldErrors
       } else if (401 == axiosError.response?.status) {
         store.beforeLoginUrl = router.currentRoute.value.fullPath
         NotificationUtils.showWaringNotification(ViewMsg.NotLogin)
         users.logout()
         await router.push('/login')
       } else if (422 == axiosError.response?.status) {
-        const data = axiosError.response?.data as { message: string }
+        const data = axiosError.response?.data as ResponseError
         NotificationUtils.showErrorNotification(data.message)
       } else {
         console.error('server error', error)
         NotificationUtils.showErrorNotification(ViewMsg.ServerError)
       }
-      overlayStore.closeOverlay()
       return Promise.reject(error)
     }
   )
@@ -85,64 +99,76 @@ export const useAxios = () => {
   const axiosInstance = createInstance()
   const overlayStore = useOverlayStore()
 
-  const httpGet = async <T = unknown, R = T>(
+  const httpGet = async <T = unknown>(
     url: string,
     params?: MaybeRef<unknown>,
     config: AxiosConfig = {}
-  ): Promise<R> => {
-    return httpRequest(url, params, 'GET', config)
+  ) => {
+    config.method = 'GET'
+    return httpRequest<T>(url, params, config)
   }
 
-  const httpPost = async <T = unknown, R = T>(
+  const httpPost = async <T = unknown>(
     url: string,
     data?: MaybeRef<unknown>,
     config: AxiosConfig = {}
-  ): Promise<R> => {
-    return httpRequest(url, data, 'POST', config)
+  ) => {
+    config.method = 'POST'
+    return httpRequest<T>(url, data, config)
   }
 
-  const httpPut = async <T = unknown, R = T>(
+  const httpPut = async <T = unknown>(
     url: string,
     data?: MaybeRef<unknown>,
     config: AxiosConfig = {}
-  ): Promise<R> => {
-    return httpRequest(url, data, 'PUT', config)
+  ) => {
+    config.method = 'PUT'
+    return httpRequest<T>(url, data, config)
   }
 
-  const httpDelete = async <T = unknown, R = T>(
+  const httpDelete = async <T = unknown>(
     url: string,
     params?: MaybeRef<unknown>,
     config: AxiosConfig = {}
-  ): Promise<R> => {
-    return httpRequest(url, params, 'DELETE', config)
+  ) => {
+    config.method = 'DELETE'
+    return httpRequest<T>(url, params, config)
   }
 
-  const httpRequest = async <T = unknown, R = T>(
+  const httpRequest = async <T = unknown>(
     url: string,
     requestData?: MaybeRef<unknown>,
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'POST',
     config: AxiosConfig = {}
-  ): Promise<R> => {
+  ) => {
     if (config.mask == undefined || config.mask) {
       overlayStore.openOverlay()
     }
 
-    config = mergeConfig(config, { headers: { Authorization: 'Bearer ' + usersStore.users?.token } })
-    if (['GET', 'DELETE'].includes(method)) {
+    if (!config.method) {
+      config.method = 'GET'
+    }
+
+    if (!config.headers) {
+      config.headers = {}
+    }
+
+    config.headers.Authorization = 'Bearer ' + usersStore.users?.token
+
+    if (['GET', 'DELETE'].includes(upperCase(config.method!))) {
       config.params = toValue(requestData)
     }
 
-    switch (method) {
+    switch (upperCase(config.method!)) {
       case 'GET':
-        return axiosInstance.get<T, R>(url, config)
+        return (await axiosInstance.get<T>(url, config)).data
       case 'POST':
-        return axiosInstance.post<T, R>(url, toValue(requestData), config)
+        return (await axiosInstance.post<T>(url, toValue(requestData), config)).data
       case 'PUT':
-        return axiosInstance.put<T, R>(url, toValue(requestData), config)
+        return (await axiosInstance.put<T>(url, toValue(requestData), config)).data
       case 'DELETE':
-        return axiosInstance.delete<T, R>(url, config)
+        return (await axiosInstance.delete<T>(url, config)).data
       default:
-        throw new Error(`Unsupported HTTP method: ${method}`)
+        throw new Error(`Unsupported HTTP method: ${config.method}`)
     }
   }
 
