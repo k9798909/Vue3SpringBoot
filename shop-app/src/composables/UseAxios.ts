@@ -76,27 +76,26 @@ const responseInterceptors = (instance: AxiosInstance) => {
 }
 
 //建立axios實體
-const createInstance = (config: AxiosRequestConfig = {}): AxiosInstance => {
-  config.baseURL = '/api'
-  config.paramsSerializer = (params) =>
-    qs.stringify(params, {
-      arrayFormat: 'brackets', //解決陣列問題
-      allowDots: true //解決物件問題
-    })
-  if (!config.headers) {
-    config.headers = {
+const createInstance = (): AxiosInstance => {
+  const instance: AxiosInstance = axios.create({
+    baseURL:'/api',
+    paramsSerializer:(params) =>
+      qs.stringify(params, {
+        arrayFormat: 'brackets', //解決陣列問題
+        allowDots: true //解決物件問題
+      }),
+    headers : {
       'Content-type': 'application/json'
     }
-  }
-  const instance: AxiosInstance = axios.create(config)
+  })
   requestInterceptors(instance)
   responseInterceptors(instance)
   return instance
 }
 
+const axiosInstance = createInstance()
 export const useAxios = () => {
   const usersStore = useUsersStore()
-  const axiosInstance = createInstance()
   const overlayStore = useOverlayStore()
 
   const httpGet = async <T = unknown>(
